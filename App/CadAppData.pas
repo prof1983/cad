@@ -9,9 +9,11 @@ unit CadAppData;
 interface
 
 uses
-  ABase, AUiBase, CadAppBase, {CadCoreBase,} CadDrawBase;
+  ABase, AUiBase, CadAppBase, CadCoreBase, CadDrawBase;
 
 var
+  CadDataGrid: AStringGrid;
+
   {** Событие обновления данных }
   FCompileExtDataEvent: AEvent;
 
