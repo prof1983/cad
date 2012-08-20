@@ -2,7 +2,7 @@
 @Abstract Cad.App data
 @Author Prof1983 <prof1983@ya.ru>
 @Created 02.07.2009
-@LastMod 10.08.2012
+@LastMod 20.08.2012
 }
 unit CadAppData;
 
@@ -55,6 +55,9 @@ var
 
   {** Основной элемент отрисовки графики }
   PaintBoxCanvas: ACanvas;
+
+  {** Интерфейс к внешним данным }
+  TablData_IsModyfid: Boolean;
 
 implementation
 
