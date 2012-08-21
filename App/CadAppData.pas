@@ -2,7 +2,7 @@
 @Abstract Cad.App data
 @Author Prof1983 <prof1983@ya.ru>
 @Created 02.07.2009
-@LastMod 20.08.2012
+@LastMod 21.08.2012
 }
 unit CadAppData;
 

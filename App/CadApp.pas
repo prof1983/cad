@@ -2,7 +2,7 @@
 @Abstract Cad.App
 @Author Prof1983 <prof1983@ya.ru>
 @Created 30.11.2009
-@LastMod 10.08.2012
+@LastMod 21.08.2012
 }
 unit CadApp;
 
@@ -18,7 +18,7 @@ uses
   Types,
   ABase, ABaseTypes, {AEvents,}
   AUi, AUiBase, AUtils,
-  CadAppBase, CadAppData,
+  CadAppBase, CadAppData, CadAppDataUtils, CadAppLoader,
   {CadCore,} CadCoreBase,
   {CadDraw,} CadDrawBase;
 
@@ -40,6 +40,7 @@ function FindNodeByNum(NodeNum: AInteger): AInteger; stdcall;
 {** Возвращает объект-событие обновления данных }
 function GetCompileExtDataEvent(): AEvent; stdcall;
 
+{** Возвращает индекс активного слоя }
 function GetCurrentLayerIndex(): AInteger; stdcall;
 
 function GetMaxViewPort(): TRect; stdcall;
@@ -101,10 +102,6 @@ function SaveFileExWS(const FileName, StrokaDan, StrokaUO: AWideString; Version:
     переводит позицию отображения схемы на нужную ветвь }
 function SelectBranch(BranchNum: AInteger): AInteger; stdcall;
 
-{** Устанавливает режим отображения "Пожар" }
-function SetFireMode(NomVetvi, PlaVetvi: AInteger; const NameVetvi: AWideString;
-    const MasVydV: TIntArray): AError; stdcall;
-
 {** Устанавливает режим отображения всех фигур }
 function SetIsShowAllFigures(Value: ABoolean): AError; stdcall;
 
@@ -153,6 +150,10 @@ function ShowPrinterSetupDialog(): AError; stdcall;
 function ShowSettingsWin(): AInteger; stdcall;
 
 implementation
+
+uses
+  CadAppMain,
+  CadMainWin;
 
 { Public }
 
@@ -224,7 +225,7 @@ function GetCurrentLayerIndex(): AInteger;
 begin
   {$IFDEF VCL}
   try
-    Result := DrawWin_GetCurrentLayerIndex();
+    Result := CadMainWin_GetCurrentLayerIndex();
   except
     Result := -1;
   end;
@@ -343,31 +344,12 @@ end;
 
 function LoadGraphFileP(const FileName: APascalString): AError;
 begin
-  {$IFDEF VCL}
-  try
-    if LoadGraphFileA(FileName, AControl(DrawWin.PaintBox1)) then - Use CadPaintBox
-      Result := 0
-    else
-      Result := -2;
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
+  Result := CadApp_LoadGraphFileP(FileName);
 end;
 
 function LoadGraphFileA(const FileName: string; PaintBox1: AControl): Boolean;
 begin
-  {$IFDEF VCL}
-  try
-    Result := CadApp_LoadGraphFileA(FileName, PaintBox1);
-  except
-    Result := False;
-  end;
-  {$ELSE}
-  Result := False;
-  {$ENDIF VCL}
+  Result := CadApp_LoadGraphFileA(FileName, PaintBox1);
 end;
 
 function Logger_AddP(const Text: APascalString): AInteger;
@@ -413,8 +395,7 @@ function Project_New(): AError;
 begin
   {$IFDEF VCL}
   try
-    CadMainWin_Project_New();
-    Result := 0;
+    Result := CadMainWin_CreateNewProject();
   except
     Result := -1;
   end;
@@ -466,21 +447,6 @@ function SetDocDirectory(const Value: AWideString): AError;
 begin
   DocDirectory := Value;
   Result := 0;
-end;
-
-function SetFireMode(NomVetvi, PlaVetvi: AInteger; const NameVetvi: AWideString;
-    const MasVydV: TIntArray): AError; stdcall;
-begin
-  {$IFDEF VCL}
-  try
-    CadApp_SetFireMode(NomVetvi, PlaVetvi, NameVetvi, MasVydV);
-    Result := 0;
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
 end;
 
 function SetIsShowAllFigures(Value: ABoolean): AError;
@@ -615,16 +581,7 @@ end;
 
 function ShowPrintDialog(): AError;
 begin
-  {$IFDEF VCL}
-  try
-    fPrint.ShowPrintDlg(CadImgPath, AirFlag);
-    Result := 0;
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
+  Result := CadApp_ShowPrintDialog();
 end;
 
 function ShowPrinterSetupDialog(): AError;
