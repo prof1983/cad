@@ -2,7 +2,7 @@
 @Abstract Cad.Core main functions
 @Author Prof1983 <prof1983@ya.ru>
 @Created 10.08.2012
-@LastMod 10.08.2012
+@LastMod 21.08.2012
 }
 unit CadCoreMain;
 
@@ -17,19 +17,21 @@ uses
     @return
       если расширение найдено, то возвращает его номер (индекс+1);
       если расширение не найдено, то возвращает ноль. }
-function CadCore_CheckExt(const Ext: APascalString): AInteger; stdcall;
+function CadCore_CheckExt(const Ext: APascalString): AInteger; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadCore_CheckFileExt(const FileName: APascalString): AInteger; stdcall;
+function CadCore_CheckFileExt(const FileName: APascalString): AInteger; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadCore_Fin(): AError;
+function CadCore_Fin(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadCore_GetProjectFileName(): APascalString; stdcall;
+function CadCore_GetDrawFlag(): AInt; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadCore_GetProjectFilePath(): APascalString; stdcall;
+function CadCore_GetProjectFileName(): APascalString; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadCore_Init(): AError;
+function CadCore_GetProjectFilePath(): APascalString; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadCore_RegisterExt(const Ext: APascalString): AInteger; stdcall;
+function CadCore_Init(): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadCore_RegisterExt(const Ext: APascalString): AInteger; {$ifdef AStdCall}stdcall;{$endif}
 
 implementation
 
@@ -71,6 +73,11 @@ begin
   SetLength(FRegisteredExt, 0);
   FInitialized := False;
   Result := 0;
+end;
+
+function CadCore_GetDrawFlag(): AInt;
+begin
+  Result := DrawFlag;
 end;
 
 function CadCore_GetProjectFileName(): APascalString;

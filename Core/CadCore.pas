@@ -2,7 +2,7 @@
 @Abstract Cad.Core
 @Author Prof1983 <prof1983@ya.ru>
 @Created 25.11.2009
-@LastMod 10.08.2012
+@LastMod 21.08.2012
 }
 unit CadCore;
 
@@ -19,6 +19,8 @@ function CheckFileExtP(const FileName: APascalString): AInteger; stdcall;
 function CheckFileExtWS(const FileName: AWideString): AInteger; stdcall;
 
 function Done(): AError; stdcall; deprecated; // Use Fin()
+
+function GetDrawFlag(): AInt; stdcall;
 
 function GetProjectFileNameWS(): AWideString; stdcall;
 
@@ -64,6 +66,11 @@ begin
   except
     Result := -1;
   end;
+end;
+
+function GetDrawFlag(): AInt;
+begin
+  Result := CadCore_GetDrawFlag();
 end;
 
 function GetProjectFileNameWS(): AWideString; stdcall;
