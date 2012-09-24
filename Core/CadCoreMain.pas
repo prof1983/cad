@@ -2,14 +2,14 @@
 @Abstract Cad.Core main functions
 @Author Prof1983 <prof1983@ya.ru>
 @Created 10.08.2012
-@LastMod 21.08.2012
+@LastMod 24.09.2012
 }
 unit CadCoreMain;
 
 interface
 
 uses
-  ABase, AStringUtils, AUtils;
+  ABase, AStringUtils, AUtils, AUtilsMain;
 
 // --- CadCore ---
 
