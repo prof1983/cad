@@ -2,7 +2,7 @@
 @Abstract Cad.App choose angle dialog
 @Author Prof1983 <prof1983@ya.ru>
 @Created 21.08.2012
-@LastMod 22.08.2012
+@LastMod 16.11.2012
 }
 unit CadAppAngleDialog;
 
@@ -15,7 +15,7 @@ uses
   {$IFDEF VCL}
   Controls, SysUtils, fAngle;
   {$ELSE}
-  AUiBase, AUiWindows;
+  AUiBase, AUiControls, AUiWindows;
   {$ENDIF}
 
 function CadApp_ShowAngleDialog(var AngleDeg: AFloat; ParAngle: AInt): ABoolean;
@@ -43,27 +43,14 @@ begin
     FormAngle.Free;
   end;
   {$ELSE}
-  AUi_NewWindow(xxx)
+  FormAngle := AUiWindow_New();
+  AUiControl_SetSize(FormAngle, 233, 70);
+  AUiControl_SetPosition(FormAngle, 492, 248);
+  AUiControl_SetTextP(FormAngle, '¬ведите заданный угол');
 
-object AngleForm: TAngleForm
-  Left = 492
-  Top = 248
-  AutoScroll = False
-  BorderIcons = []
-  Caption = '¬ведите заданный угол'
-  ClientHeight = 70
-  ClientWidth = 233
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  {
   Position = poDesktopCenter
   OnActivate = FormActivate
-  PixelsPerInch = 96
-  TextHeight = 13
   object MainPanel: TPanel
     Left = 0
     Top = 0
@@ -102,7 +89,10 @@ object AngleForm: TAngleForm
       TabOrder = 2
     end
   end
-end
+  }
+
+  AUiWindow_ShowModal(FormAngle);
+  AUiWindow_Free(FormAngle);
   {$ENDIF VCL}
 end;
 
