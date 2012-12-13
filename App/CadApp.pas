@@ -2,7 +2,7 @@
 @Abstract Cad.App
 @Author Prof1983 <prof1983@ya.ru>
 @Created 30.11.2009
-@LastMod 21.08.2012
+@LastMod 13.12.2012
 }
 unit CadApp;
 
@@ -510,6 +510,7 @@ end;
 function SetDataGrid(Value: AStringGrid): AError;
 begin
   CadDataGrid := Value;
+  Result := 0;
 end;
 
 function Show2D(): ABoolean;
