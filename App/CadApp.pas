@@ -2,7 +2,7 @@
 @Abstract Cad.App
 @Author Prof1983 <prof1983@ya.ru>
 @Created 30.11.2009
-@LastMod 13.12.2012
+@LastMod 25.12.2012
 }
 unit CadApp;
 
@@ -17,7 +17,7 @@ interface
 uses
   Types,
   ABase, ABaseTypes, {AEvents,}
-  AUi, AUiBase, AUtils,
+  AUi, AUiBase,
   CadAppBase, CadAppData, CadAppDataUtils, CadAppLoader,
   {CadCore,} CadCoreBase,
   {CadDraw,} CadDrawBase;

@@ -2,14 +2,16 @@
 @Abstract Cad.Core main functions
 @Author Prof1983 <prof1983@ya.ru>
 @Created 10.08.2012
-@LastMod 24.09.2012
+@LastMod 25.12.2012
 }
 unit CadCoreMain;
 
 interface
 
 uses
-  ABase, AStringUtils, AUtils, AUtilsMain;
+  ABase,
+  AStringUtils,
+  AUtilsMain;
 
 // --- CadCore ---
 
@@ -63,7 +65,7 @@ function CadCore_CheckFileExt(const FileName: APascalString): AInteger;
 var
   Ext: string;
 begin
-  Ext := AString_ToUpperWS(AUtils.TrimWS(AUtils.ExtractFileExtWS(FileName)));
+  Ext := AString_ToUpperWS(AUtils_TrimP(AUtils_ExtractFileExtP(FileName)));
   // Получаем номер зарегистрированного типа файла по расширению.
   Result := CadCore_CheckExt(Ext);
 end;
