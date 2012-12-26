@@ -2,7 +2,7 @@
 @Abstract Cad.App
 @Author Prof1983 <prof1983@ya.ru>
 @Created 30.11.2009
-@LastMod 25.12.2012
+@LastMod 26.12.2012
 }
 unit CadApp;
 
@@ -152,8 +152,8 @@ function ShowSettingsWin(): AInteger; stdcall;
 implementation
 
 uses
-  CadAppMain,
-  CadMainWin;
+  {$ifdef Vcl}CadMainWin,{$endif}
+  CadAppMain;
 
 { Public }
 
