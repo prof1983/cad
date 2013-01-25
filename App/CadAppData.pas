@@ -43,7 +43,10 @@ var
   DrawWin_IsClosing1: Boolean;
 
   {** Главное меню }
-  MainToolMenu: AToolMenu;
+  MainMenu: AMenu; {AToolMenu}
+  MainFileMenu: AMenuItem;
+  MainTaskMenu: AMenuItem;
+  MainViewMenu: AMenuItem;
 
   {** Вид отображения схемы:
       0-Нормальное распределение,
