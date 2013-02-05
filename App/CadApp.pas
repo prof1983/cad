@@ -2,7 +2,7 @@
 @Abstract Cad.App
 @Author Prof1983 <prof1983@ya.ru>
 @Created 30.11.2009
-@LastMod 26.12.2012
+@LastMod 01.02.2013
 }
 unit CadApp;
 
@@ -16,11 +16,16 @@ interface
 
 uses
   Types,
-  ABase, ABaseTypes, {AEvents,}
-  AUi, AUiBase,
-  CadAppBase, CadAppData, CadAppDataUtils, CadAppLoader,
-  {CadCore,} CadCoreBase,
-  {CadDraw,} CadDrawBase;
+  ABase,
+  ABaseTypes,
+  AUiBase,
+  AUiDialogs2,
+  CadAppBase,
+  CadAppData,
+  CadAppDataUtils,
+  CadAppLoader,
+  CadCoreBase,
+  CadDrawBase;
 
 {** Расчитывает видимые фигуры }
 function CalcVisible(): AError; stdcall;
@@ -588,7 +593,7 @@ end;
 function ShowPrinterSetupDialog(): AError;
 begin
   {$IFDEF VCL}
-  Result := AUI.Dialog_PrinterSetup();
+  Result := AUi_ExecutePrinterSetupDialog();
   {$ELSE}
   Result := -1;
   {$ENDIF VCL}
