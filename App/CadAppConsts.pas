@@ -50,7 +50,6 @@ resourcestring
   SToolMenuLegendEditor = 'Редактор условных обозначений';
   SToolMenuPlaSearch = 'Найти позицию ПЛА';
   SToolMenuPrinterSetup = 'Окно выбора и настройки печати';
-  SToolMenuRecovery = 'Проверка и исправление схемы';
   SToolMenuResetBranch = 'Сброс параметров ветви';
   SToolMenuResetBranchAll = 'Сброс параметров всех ветвей';
   SToolMenuRotateBr = 'Перевернуть ветвь';

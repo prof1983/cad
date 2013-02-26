@@ -2,7 +2,7 @@
 @Abstract Cad.Core base consts and types
 @Author Prof1983 <prof1983@ya.ru>
 @Created 25.11.2009
-@LastMod 21.08.2012
+@LastMod 26.02.2013
 }
 unit CadCoreBase;
 
@@ -62,7 +62,7 @@ const
   LogFlagDebugMsg  = $02000000;
 
 type
-  TCadLogProc = procedure(const Msg: AnsiString; Flags: TCadLogFlags; ObjNum: AInt); stdcall;
+  TCadLogProc = ABaseTypes.AAddToLogA_Proc;
 
 implementation
 

@@ -2,15 +2,15 @@
 @Abstract Cad.App
 @Author Prof1983 <prof1983@ya.ru>
 @Created 30.11.2009
-@LastMod 01.02.2013
+@LastMod 26.02.2013
 }
 unit CadApp;
 
 {$IFDEF HomeCad}{$DEFINE NoVcl}{$ENDIF}
 
-{$IFNDEF NoVcl}
-  {$DEFINE VCL}
-{$ENDIF}
+{$ifndef NoVcl}
+  {$define Vcl}
+{$endif}
 
 interface
 
@@ -30,23 +30,25 @@ uses
 {** Расчитывает видимые фигуры }
 function CalcVisible(): AError; stdcall;
 
-{** Финализирует модуль CadApp }
-function Done(): AError; stdcall; deprecated; // Use Fin()
+function CreateNewProject(): AError; stdcall;
 
 {** Выводит значок ПЛА }
 function DrawPla(): AError; stdcall;
 
+{** Финализирует модуль CadApp }
+function Fin(): AError; stdcall;
+
 {** Возвращает номер строки по номеру ветви }
-function FindBranchByNum(BranchNum: AInteger): AInteger; stdcall;
+function FindBranchByNum(BranchNum: AInt): AInt; stdcall;
 
 {** Возвращает номер строки для узла NodeNum }
-function FindNodeByNum(NodeNum: AInteger): AInteger; stdcall;
+function FindNodeByNum(NodeNum: AInt): AInt; stdcall;
 
 {** Возвращает объект-событие обновления данных }
 function GetCompileExtDataEvent(): AEvent; stdcall;
 
 {** Возвращает индекс активного слоя }
-function GetCurrentLayerIndex(): AInteger; stdcall;
+function GetCurrentLayerIndex(): AInt; stdcall;
 
 function GetMaxViewPort(): TRect; stdcall;
 
@@ -54,61 +56,43 @@ function GetMaxViewPort(): TRect; stdcall;
 function Init(): AError; stdcall;
 
 {** Выбор катринки для вставки в рисунок }
-function InputPic: ABoolean; stdcall;
+function InputPic(): ABool; stdcall;
 
 {** Импортирует данные из файла данных }
 function ImportDan(): AError; stdcall;
 
 {** Загружает файл }
-function LoadFile02(const FileName: AWideString): ABoolean; stdcall;
+function LoadFileExP(const FileName: APascalString; FileType: AInt; IsAll: ABool): ABool;
 
 {** Загружает файл }
-function LoadFileExP(const FileName: APascalString; FileType: AInteger; IsAll: ABoolean): ABoolean; stdcall;
-
-{** Загружает файл }
-function LoadFileP(const FileName: APascalString): AError; stdcall;
-
-{** Загружает файл }
-function LoadFileWS(const FileName: AWideString): AError; stdcall;
+function LoadFileP(const FileName: APascalString): AError;
 
 {** Загружает графический файл
     @param PaintBox1 - (TImage) }
-function LoadGraphFileA(const FileName: string; PaintBox1: AControl): Boolean;
+function LoadGraphFile2P(const FileName: APascalString; PaintBox1: AControl): ABool;
 
 {** Загружает графический файл }
-function LoadGraphFileP(const FileName: APascalString): AError; stdcall;
-
-function Logger_AddP(const Text: APascalString): AInteger; stdcall; deprecated; // Use AddToLogP()
+function LoadGraphFileP(const FileName: APascalString): AError;
 
 {** Вызывает диалог выбор файла }
-function Open2(DefFilterIndex: AInteger; IsAll: ABoolean): ABoolean; stdcall;
+function Open2(DefFilterIndex: AInt; IsAll: ABool): ABool; stdcall;
 
 {** Подготавливает перед инициализацией }
-function Prepare(): AInteger; stdcall;
-
-{** Создает новый проект }
-function Project_New(): AError; stdcall; deprecated; // Use CreateNewProject()
+function Prepare(): AInt; stdcall;
 
 {** Сохраняет схему и данные в файл
     @param FileName - Имя сохраняемого файла
     @param StrokaDan - Строка с данными
     @param StrokaUO - Строка с описанием условных обозначений
     @param Version - Версия файла для сохранения }
-function SaveFileA(const FileName, StrokaDan, StrokaUO: APascalString; Version: AInteger): AError; stdcall; deprecated; // Use SaveFileExP()
-
-{** Сохраняет схему и данные в файл
-    @param FileName - Имя сохраняемого файла
-    @param StrokaDan - Строка с данными
-    @param StrokaUO - Строка с описанием условных обозначений
-    @param Version - Версия файла для сохранения }
-function SaveFileExWS(const FileName, StrokaDan, StrokaUO: AWideString; Version: AInteger): AInteger; stdcall;
+function SaveFileExP(const FileName, StrokaDan, StrokaUO: APascalString; Version: AInt): AError;
 
 {** Делает указанную ветвь активной, переходит на соответсвующую строку данных в таблице ветвей,
     переводит позицию отображения схемы на нужную ветвь }
-function SelectBranch(BranchNum: AInteger): AInteger; stdcall;
+function SelectBranch(BranchNum: AInt): AInt; stdcall;
 
 {** Устанавливает режим отображения всех фигур }
-function SetIsShowAllFigures(Value: ABoolean): AError; stdcall;
+function SetIsShowAllFigures(Value: ABool): AError; stdcall;
 
 {** Задает реакцию на событие OnCompileExtData }
 function SetOnCompileExtData(Value: AProc): AError; stdcall;
@@ -126,15 +110,15 @@ function SetOnDrawWinInit(Value: AProc): AError; stdcall;
 function SetOnSaveFile(Value: CadApp_OnSaveFile_Proc): AError; stdcall;
 
 {** Устанавливает курсор на указанную ветвь }
-function SetPositionBranch(BranchNum: AInteger): AError; stdcall;
+function SetPositionBranch(BranchNum: AInt): AError; stdcall;
 
 function SetDataGrid(Value: AStringGrid): AError; stdcall;
 
 {** Отображает 2D cхему }
-function Show2D(): ABoolean; stdcall;
+function Show2D(): ABool; stdcall;
 
 {** Отображает 3D cхему }
-function Show3D(PaintBox: AImage; X, Z: AInteger): ABoolean; stdcall;
+function Show3D(PaintBox: AImage; X, Z: AInt): ABool; stdcall;
 
 {** Отображает справку по программе }
 function ShowHelp(): AError; stdcall;
@@ -143,7 +127,7 @@ function ShowHelp(): AError; stdcall;
 function ShowLegend(): AError; stdcall;
 
 {** Отображает редактор условных обозначений }
-function ShowLegendWin2P(var StrokaUO: APascalString): AError; stdcall;
+function ShowLegendWin2P(var StrokaUO: APascalString): AError;
 
 {** Отображает диалоговое окно для печати всей схемы }
 function ShowPrintDialog(): AError; stdcall;
@@ -152,7 +136,7 @@ function ShowPrintDialog(): AError; stdcall;
 function ShowPrinterSetupDialog(): AError; stdcall;
 
 {** Вызов диалога "Опции" }
-function ShowSettingsWin(): AInteger; stdcall;
+function ShowSettingsWin(): AInt; stdcall;
 
 implementation
 
@@ -165,37 +149,32 @@ uses
 function CalcVisible(): AError;
 begin
   {$IFDEF VCL}
-  try
-    CadApp_CalcVisible();
-    Result := 0;
-  except
-    Result := -1;
-  end;
+  Result := CadApp_CalcVisible();
   {$ELSE}
   Result := -1;
   {$ENDIF VCL}
 end;
 
-function Done(): AError;
+function CreateNewProject(): AError;
 begin
-  Result := 0;
+  Result := CadApp_CreateNewProject();
 end;
 
 function DrawPla(): AError;
 begin
   {$IFDEF VCL}
-  try
-    CadApp_DrawPla();
-    Result := 0;
-  except
-    Result := -1;
-  end;
+  Result := CadApp_DrawPla();
   {$ELSE}
   Result := -1;
   {$ENDIF VCL}
 end;
 
-function FindBranchByNum(BranchNum: AInteger): AInteger;
+function Fin(): AError;
+begin
+  Result := CadApp_Fin();
+end;
+
+function FindBranchByNum(BranchNum: AInt): AInt;
 begin
   {$IFDEF VCL}
   try
@@ -208,7 +187,7 @@ begin
   {$ENDIF VCL}
 end;
 
-function FindNodeByNum(NodeNum: AInteger): AInteger;
+function FindNodeByNum(NodeNum: AInt): AInt;
 begin
   {$IFDEF VCL}
   try
@@ -226,7 +205,7 @@ begin
   Result := FCompileExtDataEvent;
 end;
 
-function GetCurrentLayerIndex(): AInteger;
+function GetCurrentLayerIndex(): AInt;
 begin
   {$IFDEF VCL}
   try
@@ -276,37 +255,20 @@ begin
   {$ENDIF VCL}
 end;
 
-function InputPic(): ABoolean;
+function InputPic(): ABool;
 begin
   {$IFDEF VCL}
-  try
-    Result := CadApp_InputPic();
-  except
-    Result := False;
-  end;
+  Result := CadApp_InputPic();
   {$ELSE}
   Result := False;
   {$ENDIF VCL}
 end;
 
-function LoadFileExP(const FileName: APascalString; FileType: AInteger; IsAll: ABoolean): ABoolean;
+function LoadFileExP(const FileName: APascalString; FileType: AInt; IsAll: ABool): ABool;
 begin
   {$IFDEF VCL}
   try
     Result := CadApp_LoadFileA(FileName, FileType, IsAll);
-  except
-    Result := False;
-  end;
-  {$ELSE}
-  Result := False;
-  {$ENDIF VCL}
-end;
-
-function LoadFile02(const FileName: AWideString): ABoolean;
-begin
-  {$IFDEF VCL}
-  try
-    Result := CadApp_LoadFile(FileName);
   except
     Result := False;
   end;
@@ -331,20 +293,9 @@ begin
   {$ENDIF VCL}
 end;
 
-function LoadFileWS(const FileName: AWideString): AError;
+function LoadGraphFile2P(const FileName: APascalString; PaintBox1: AControl): ABool;
 begin
-  {$IFDEF VCL}
-  try
-    if CadApp_LoadFile(FileName) then
-      Result := 0
-    else
-      Result := -2;
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
+  Result := CadApp_LoadGraphFileA(FileName, PaintBox1);
 end;
 
 function LoadGraphFileP(const FileName: APascalString): AError;
@@ -352,12 +303,7 @@ begin
   Result := CadApp_LoadGraphFileP(FileName);
 end;
 
-function LoadGraphFileA(const FileName: string; PaintBox1: AControl): Boolean;
-begin
-  Result := CadApp_LoadGraphFileA(FileName, PaintBox1);
-end;
-
-function Logger_AddP(const Text: APascalString): AInteger;
+(*function Logger_AddP(const Text: APascalString): AInt;
 begin
   {$IFDEF VCL}
   try
@@ -368,9 +314,9 @@ begin
   {$ELSE}
   Result := -1;
   {$ENDIF VCL}
-end;
+end;*)
 
-function Open2(DefFilterIndex: AInteger; IsAll: ABoolean): ABoolean;
+function Open2(DefFilterIndex: AInt; IsAll: ABool): ABool;
 begin
   {$IFDEF VCL}
   try
@@ -383,66 +329,28 @@ begin
   {$ENDIF VCL}
 end;
 
-function Prepare(): AInteger;
+function Prepare(): AInt;
 begin
   {$IFDEF VCL}
-  try
-    Result := CadApp_Prepare();
-  except
-    Result := -1;
-  end;
+  Result := CadApp_Prepare();
   {$ELSE}
   Result := -1;
   {$ENDIF VCL}
 end;
 
-function Project_New(): AError;
+function SaveFileExP(const FileName, StrokaDan, StrokaUO: APascalString; Version: AInt): AError;
 begin
   {$IFDEF VCL}
-  try
-    Result := CadMainWin_CreateNewProject();
-  except
-    Result := -1;
-  end;
+  Result := CadApp_SaveFileExP(FileName, StrokaDan, StrokaUO, Version);
   {$ELSE}
   Result := -1;
   {$ENDIF VCL}
 end;
 
-function SaveFileA(const FileName, StrokaDan, StrokaUO: APascalString; Version: AInteger): AError;
+function SelectBranch(BranchNum: AInt): AInt;
 begin
   {$IFDEF VCL}
-  try
-    Result := CadApp_SaveFileA(FileName, StrokaDan, StrokaUO, Version);
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
-end;
-
-function SaveFileExWS(const FileName, StrokaDan, StrokaUO: AWideString; Version: AInteger): AInteger;
-begin
-  {$IFDEF VCL}
-  try
-    Result := CadApp_SaveFileA(FileName, StrokaDan, StrokaUO, Version);
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
-end;
-
-function SelectBranch(BranchNum: AInteger): AInteger;
-begin
-  {$IFDEF VCL}
-  try
-    Result := CadApp_SelectBranch(BranchNum);
-  except
-    Result := -1;
-  end;
+  Result := CadApp_SelectBranch(BranchNum);
   {$ELSE}
   Result := -1;
   {$ENDIF VCL}
@@ -454,10 +362,9 @@ begin
   Result := 0;
 end;
 
-function SetIsShowAllFigures(Value: ABoolean): AError;
+function SetIsShowAllFigures(Value: ABool): AError;
 begin
-  FIsShowAllFigures := Value;
-  Result := 0;
+  Result := CadApp_SetIsShowAllFigures(Value);
 end;
 
 function SetOnCompileExtData(Value: AProc): AError;
@@ -498,15 +405,10 @@ begin
   Result := 0;
 end;
 
-function SetPositionBranch(BranchNum: AInteger): AError;
+function SetPositionBranch(BranchNum: AInt): AError;
 begin
   {$IFDEF VCL}
-  try
-    Data_Branch_SetPosition(BranchNum);
-    Result := 0;
-  except
-    Result := -1;
-  end;
+  Result := CadApp_SetPositionBranch(BranchNum);
   {$ELSE}
   Result := -1;
   {$ENDIF VCL}
@@ -518,7 +420,7 @@ begin
   Result := 0;
 end;
 
-function Show2D(): ABoolean;
+function Show2D(): ABool;
 begin
   {$IFDEF VCL}
   try
@@ -531,7 +433,7 @@ begin
   {$ENDIF VCL}
 end;
 
-function Show3D(PaintBox: AImage; X, Z: AInteger): ABoolean;
+function Show3D(PaintBox: AImage; X, Z: AInt): ABool;
 begin
   {$IFDEF VCL}
   try
@@ -560,12 +462,7 @@ end;
 function ShowLegend(): AError;
 begin
   {$IFDEF VCL}
-  try
-    CadApp_ShowLegend();
-    Result := 0;
-  except
-    Result := -1;
-  end;
+  Result := CadApp_ShowLegend();
   {$ELSE}
   Result := -1;
   {$ENDIF VCL}
@@ -599,7 +496,7 @@ begin
   {$ENDIF VCL}
 end;
 
-function ShowSettingsWin(): AInteger;
+function ShowSettingsWin(): AInt;
 begin
   {$IFDEF VCL}
   try
