@@ -2,7 +2,7 @@
 @Abstract Cad.App consts
 @Author Prof1983 <prof1983@ya.ru>
 @Created 26.04.2011
-@LastMod 25.01.2013
+@LastMod 26.02.2013
 }
 unit CadAppConsts;
 
@@ -74,17 +74,6 @@ resourcestring
   SViewMenuShowRReg = 'Ветви с заданным R';
   SViewMenuShowSchema5 = 'Схема ...';
   SViewMenuShowVent = 'Схема вентиляции';
-  SWayMenuChoose = 'Выбрать ветвь на схеме';
-  SWayMenuClose = 'Закрыть форму "Маршруты"';
-  SWayMenuCreate = 'Построить маршрут';
-  SWayMenuEdit = 'Редактировать маршрут';
-  SWayMenuList = 'Выбрать ветвь из списка';
-  SWayMenuOpen = 'Перейти к форме "Маршруты"';
-  SWayMenuSave = 'Сохранить маршрут';
-  SWayMenuSaver = 'Маршруты спасателей (ВГСЧ)';
-  SWayMenuTrash = 'Очистить список исключенных ветвей';
-  SWayMenuView = 'Показать маршрут';
-  SWayMenuWorker = 'Маршруты вывода горнорабочих';
 
 implementation
 
