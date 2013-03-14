@@ -59,6 +59,15 @@ var
   {** Interface to external data }
   TablData_IsModyfid: Boolean;
 
+  {** Branchs }
+  FBranchGrid: AStringGrid;
+
+  {** Nodes }
+  FNodeGrid: AStringGrid;
+
+  {** Ventilators }
+  FVenGrid: AStringGrid;
+
 implementation
 
 end.
