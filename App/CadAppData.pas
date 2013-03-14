@@ -2,7 +2,7 @@
 @Abstract Cad.App data
 @Author Prof1983 <prof1983@ya.ru>
 @Created 02.07.2009
-@LastMod 21.08.2012
+@LastMod 14.03.2013
 }
 unit CadAppData;
 
@@ -14,7 +14,7 @@ uses
 var
   CadDataGrid: AStringGrid;
 
-  {** Событие обновления данных }
+  {** Data update event }
   FCompileExtDataEvent: AEvent;
 
   FIsShowAllFigures: Boolean;
@@ -23,43 +23,40 @@ var
 
   NameVar_Text: APascalString;
 
+  {** Event fires when needed clean data }
+  FOnDataClear: AProc;
+
   FOnCompileExtData: AProc;
 
-  {** Срабатывает при импорте данных из Xls файла }
+  {** Event fires when importing data from Xls file }
   FOnImportDataFromXls: CadApp_OnImportDataFromXls_Proc;
 
   FOnImportDataOk: CadApp_OnImportDataOk_Proc;
 
   FOnSaveFile: CadApp_OnSaveFile_Proc;
 
-  {** Событие срабатывает при необходимости в талице с данными установить указатель на требуемый элемент
-      Obj - таблица - номер таблицы (0-Branchs, 1-Nodes)
-      Data - номер элемента (ветви/узла) }
+  {** Event fires when required in the table with data set pointer to the desired item
+      Obj - Table num (0-Branchs, 1-Nodes)
+      Data - Element (branch/node) num }
   FOnSetPosition: ACallbackProc;
 
   DocDirectory: APascalString;
 
-  {** Окно отрисовки находится в режиме закрытия }
+  {** True if the window rendering is in the closing }
   DrawWin_IsClosing1: Boolean;
 
-  {** Главное меню }
-  MainMenu: AMenu; {AToolMenu}
+  MainMenu: AMenu;
   MainFileMenu: AMenuItem;
   MainTaskMenu: AMenuItem;
   MainViewMenu: AMenuItem;
 
-  {** Вид отображения схемы:
-      0-Нормальное распределение,
-      1-Опрокинутые ветви,
-      2-Распространение пожара,
-      3-Ветви с отрицательным расходом,
-      4-Ветви с заданным R }
+  {** View the display circuitry }
   ViewMode: TCadAppViewMode;
 
-  {** Основной элемент отрисовки графики }
+  {** The main element of rendering graphics }
   PaintBoxCanvas: ACanvas;
 
-  {** Интерфейс к внешним данным }
+  {** Interface to external data }
   TablData_IsModyfid: Boolean;
 
 implementation
