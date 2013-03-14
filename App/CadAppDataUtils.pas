@@ -363,6 +363,7 @@ begin
   Row := Data_FindNode(NodeNum);
   if (Row > 0) then
     AUiGrid_DeleteRow2(TablDavl, Row);
+  Result := 0;
 end;
 
 function Data_Node_SetPosition(NodeNum: AInt): AError;
