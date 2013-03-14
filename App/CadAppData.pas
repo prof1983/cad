@@ -12,8 +12,6 @@ uses
   ABase, AUiBase, CadAppBase, CadCoreBase, CadDrawBase;
 
 var
-  CadDataGrid: AStringGrid;
-
   {** Data update event }
   FCompileExtDataEvent: AEvent;
 
@@ -32,6 +30,8 @@ var
   FOnImportDataFromXls: CadApp_OnImportDataFromXls_Proc;
 
   FOnImportDataOk: CadApp_OnImportDataOk_Proc;
+
+  FOnNodeFocus: AProc;
 
   FOnSaveFile: CadApp_OnSaveFile_Proc;
 
@@ -67,6 +67,9 @@ var
 
   {** Ventilators }
   FVenGrid: AStringGrid;
+
+  {** Stolb }
+  FBlockGrid: AStringGrid;
 
 implementation
 

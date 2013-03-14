@@ -2,7 +2,7 @@
 @Abstract Cad.Core main functions
 @Author Prof1983 <prof1983@ya.ru>
 @Created 10.08.2012
-@LastMod 20.02.2013
+@LastMod 14.03.2013
 }
 unit CadCoreMain;
 
@@ -21,7 +21,9 @@ uses
       если расширение не найдено, то возвращает ноль. }
 function CadCore_CheckExt(const Ext: APascalString): AInteger; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadCore_CheckFileExt(const FileName: APascalString): AInteger; {$ifdef AStdCall}stdcall;{$endif}
+function CadCore_CheckFileExt(const FileName: APascalString): AInt; deprecated {$ifdef ADeprText}'Use CadCore_CheckFileExtP()'{$endif};
+
+function CadCore_CheckFileExtP(const FileName: APascalString): AInt;
 
 function CadCore_Fin(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -62,6 +64,11 @@ begin
 end;
 
 function CadCore_CheckFileExt(const FileName: APascalString): AInteger;
+begin
+  Result := CadCore_CheckFileExtP(FileName);
+end;
+
+function CadCore_CheckFileExtP(const FileName: APascalString): AInt;
 var
   Ext: string;
 begin

@@ -416,7 +416,7 @@ end;
 
 function SetDataGrid(Value: AStringGrid): AError;
 begin
-  CadDataGrid := Value;
+  FBranchGrid := Value;
   Result := 0;
 end;
 
