@@ -2,7 +2,7 @@
 @Abstract Cad.App consts
 @Author Prof1983 <prof1983@ya.ru>
 @Created 26.04.2011
-@LastMod 26.02.2013
+@LastMod 15.03.2013
 }
 unit CadAppConsts;
 
@@ -36,10 +36,7 @@ resourcestring
   STaskMenuDeviceStabilitySvod = 'Сводный расчет устойчивости для вент.устр.';
   STaskMenuEr = 'Нормальное воздухораспределение';
   STaskMenuGenDan = 'Сгенерировать расчетные данные по рисунку';
-  STaskMenuIr = 'Идеальн.распределение';
-  STaskMenuOr = 'Опт.распределение';
   STaskMenuEq = 'Проверяет соответствие схемы и расчета';
-  STaskMenuEt = 'Расчет естественной тяги';
   STaskMenuSvish = 'Стрелки: свежая - исходящая';
   SToolMenuAddBase = 'Добавить в базу';
   SToolMenuCalculator = 'Калькулятор';
