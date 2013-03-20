@@ -2,7 +2,7 @@
 @Abstract Cad.App data convert
 @Author Prof1983 <prof1983@ya.ru>
 @Created 27.07.2010
-@LastMod 14.03.2013
+@LastMod 20.03.2013
 
         ----------
         | CadApp |
@@ -372,9 +372,7 @@ var
   Stroka: string;
   CountBranchs: Integer;       // Кол-во ветвей
   CountVen: Integer;           // Кол-во вентиляторов j
-  nuz: Integer;
   CountSP: Integer;
-  i: Integer;                  // Счетчик для for
   CountNodes: Integer;         // Кол-во узлов
   k_: Integer; // k
 begin
