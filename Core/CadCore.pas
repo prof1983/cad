@@ -2,7 +2,7 @@
 @Abstract Cad.Core
 @Author Prof1983 <prof1983@ya.ru>
 @Created 25.11.2009
-@LastMod 21.08.2012
+@LastMod 20.03.2013
 }
 unit CadCore;
 
@@ -16,23 +16,17 @@ function CheckExtP(const Ext: APascalString): AInteger; stdcall;
 
 function CheckFileExtP(const FileName: APascalString): AInteger; stdcall;
 
-function CheckFileExtWS(const FileName: AWideString): AInteger; stdcall;
-
-function Done(): AError; stdcall; deprecated; // Use Fin()
+function Fin(): AError; stdcall;
 
 function GetDrawFlag(): AInt; stdcall;
-
-function GetProjectFileNameWS(): AWideString; stdcall;
-
-function GetProjectFilePathWS(): AWideString; stdcall;
 
 function Init(): AError; stdcall;
 
 implementation
 
-{ Public }
+// --- Public ---
 
-function CheckExtP(const Ext: APascalString): AInteger; stdcall;
+function CheckExtP(const Ext: APascalString): AInt;
 begin
   try
     Result := CadCore_CheckExt(Ext);
@@ -41,25 +35,16 @@ begin
   end;
 end;
 
-function CheckFileExtP(const FileName: APascalString): AInteger; stdcall;
+function CheckFileExtP(const FileName: APascalString): AInt;
 begin
   try
-    Result := CadCore_CheckFileExt(FileName);
+    Result := CadCore_CheckFileExtP(FileName);
   except
     Result := -1;
   end;
 end;
 
-function CheckFileExtWS(const FileName: AWideString): AInteger; stdcall;
-begin
-  try
-    Result := CadCore_CheckFileExt(FileName);
-  except
-    Result := -1;
-  end;
-end;
-
-function Done(): AError;
+function Fin(): AError;
 begin
   try
     Result := CadCore_Fin();
@@ -73,25 +58,7 @@ begin
   Result := CadCore_GetDrawFlag();
 end;
 
-function GetProjectFileNameWS(): AWideString; stdcall;
-begin
-  try
-    Result := CadCore_GetProjectFileName();
-  except
-    Result := '';
-  end;
-end;
-
-function GetProjectFilePathWS(): AWideString; stdcall;
-begin
-  try
-    Result := CadCore_GetProjectFilePath();
-  except
-    Result := '';
-  end;
-end;
-
-function Init(): AError; stdcall;
+function Init(): AError;
 begin
   try
     Result := CadCore_Init();
