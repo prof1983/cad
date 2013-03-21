@@ -2,7 +2,7 @@
 @Abstract Cad.App data
 @Author Prof1983 <prof1983@ya.ru>
 @Created 02.07.2009
-@LastMod 14.03.2013
+@LastMod 21.03.2013
 }
 unit CadAppData;
 
@@ -40,6 +40,8 @@ var
       Data - Element (branch/node) num }
   FOnSetPosition: ACallbackProc;
 
+  FOnShow2D: AProc;
+
   DocDirectory: APascalString;
 
   {** True if the window rendering is in the closing }
@@ -70,6 +72,15 @@ var
 
   {** Stolb }
   FBlockGrid: AStringGrid;
+
+  {** Worker ways }
+  FWayWorkerGrid: AStringGrid;
+
+  {** Saver ways }
+  FWaySaverGrid: AStringGrid;
+
+  {** The developed space }
+  FVpGrid: AStringGrid;
 
 implementation
 
