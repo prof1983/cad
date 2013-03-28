@@ -2,7 +2,7 @@
 @Abstract Cad.App
 @Author Prof1983 <prof1983@ya.ru>
 @Created 30.11.2009
-@LastMod 26.02.2013
+@LastMod 28.03.2013
 }
 unit CadApp;
 
@@ -19,7 +19,7 @@ uses
   ABase,
   ABaseTypes,
   AUiBase,
-  AUiDialogs2,
+  AUiDialogsEx2,
   CadAppBase,
   CadAppData,
   CadAppDataUtils,
