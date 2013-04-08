@@ -19,9 +19,7 @@ uses
   ABase,
   ABaseTypes,
   AUiBase,
-  AUiDialogsEx2,
   CadAppBase,
-  CadAppData,
   CadAppDataUtils,
   CadAppLoader,
   CadCoreBase,
@@ -43,9 +41,6 @@ function FindBranchByNum(BranchNum: AInt): AInt; stdcall;
 
 {** Возвращает номер строки для узла NodeNum }
 function FindNodeByNum(NodeNum: AInt): AInt; stdcall;
-
-{** Возвращает объект-событие обновления данных }
-function GetCompileExtDataEvent(): AEvent; stdcall;
 
 {** Возвращает индекс активного слоя }
 function GetCurrentLayerIndex(): AInt; stdcall;
@@ -109,8 +104,6 @@ function SetOnDrawWinInit(Value: AProc): AError; stdcall;
 {** Устанавливает курсор на указанную ветвь }
 function SetPositionBranch(BranchNum: AInt): AError; stdcall;
 
-function SetDataGrid(Value: AStringGrid): AError; stdcall;
-
 {** Отображает 2D cхему }
 function Show2D(): ABool; stdcall;
 
@@ -145,11 +138,7 @@ uses
 
 function CalcVisible(): AError;
 begin
-  {$IFDEF VCL}
   Result := CadApp_CalcVisible();
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
 end;
 
 function CreateNewProject(): AError;
@@ -159,11 +148,7 @@ end;
 
 function DrawPla(): AError;
 begin
-  {$IFDEF VCL}
   Result := CadApp_DrawPla();
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
 end;
 
 function Fin(): AError;
@@ -197,11 +182,6 @@ begin
   {$ENDIF VCL}
 end;
 
-function GetCompileExtDataEvent(): AEvent;
-begin
-  Result := FCompileExtDataEvent;
-end;
-
 function GetCurrentLayerIndex(): AInt;
 begin
   {$IFDEF VCL}
@@ -217,48 +197,22 @@ end;
 
 function GetMaxViewPort(): TRect;
 begin
-  {$IFDEF VCL}
-  try
-    Result := CadApp_GetMaxViewPort();
-  except
-  end;
-  {$ENDIF VCL}
+  Result := CadApp_GetMaxViewPort();
 end;
 
 function ImportDan(): AError;
 begin
-  {$IFDEF VCL}
-  try
-    CadApp_ImportDan();
-    Result := 0;
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
+  Result := CadApp_ImportDan();
 end;
 
 function Init(): AError;
 begin
-  {$IFDEF VCL}
-  try
-    Result := CadApp_Init();
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
+  Result := CadApp_Init();
 end;
 
 function InputPic(): ABool;
 begin
-  {$IFDEF VCL}
-  Result := CadApp_InputPic();
-  {$ELSE}
-  Result := False;
-  {$ENDIF VCL}
+  Result := (CadApp_InputPic() >= 0);
 end;
 
 function LoadFileExP(const FileName: APascalString; FileType: AInt; IsAll: ABool): ABool;
@@ -300,19 +254,6 @@ begin
   Result := CadApp_LoadGraphFileP(FileName);
 end;
 
-(*function Logger_AddP(const Text: APascalString): AInt;
-begin
-  {$IFDEF VCL}
-  try
-    Result := CadMainWin_Logger_Add(Text);
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
-end;*)
-
 function Open2(DefFilterIndex: AInt; IsAll: ABool): ABool;
 begin
   {$IFDEF VCL}
@@ -328,35 +269,17 @@ end;
 
 function Prepare(): AInt;
 begin
-  {$IFDEF VCL}
   Result := CadApp_Prepare();
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
 end;
 
 function SaveFileExP(const FileName, StrokaDan, StrokaUO: APascalString; Version: AInt): AError;
 begin
-  {$IFDEF VCL}
   Result := CadApp_SaveFileExP(FileName, StrokaDan, StrokaUO, Version);
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
 end;
 
 function SelectBranch(BranchNum: AInt): AInt;
 begin
-  {$IFDEF VCL}
   Result := CadApp_SelectBranch(BranchNum);
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
-end;
-
-function SetDocDirectory(const Value: AWideString): AError;
-begin
-  DocDirectory := Value;
-  Result := 0;
 end;
 
 function SetIsShowAllFigures(Value: ABool): AError;
@@ -366,8 +289,7 @@ end;
 
 function SetOnCompileExtData(Value: AProc): AError;
 begin
-  FOnCompileExtData := Value;
-  Result := 0;
+  Result := CadApp_SetOnCompileExtData(Value);
 end;
 
 function SetOnDrawWinInit(Value: AProc): AError;
@@ -386,29 +308,17 @@ end;
 
 function SetOnImportDataFromXls(Value: CadApp_OnImportDataFromXls_Proc): AError;
 begin
-  FOnImportDataFromXls := Value;
-  Result := 0;
+  Result := CadApp_SetOnImportDataFromXls(Value);
 end;
 
 function SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError;
 begin
-  FOnImportDataOk := Value;
-  Result := 0;
+  Result := CadApp_SetOnImportDataOk(Value);
 end;
 
 function SetPositionBranch(BranchNum: AInt): AError;
 begin
-  {$IFDEF VCL}
   Result := CadApp_SetPositionBranch(BranchNum);
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
-end;
-
-function SetDataGrid(Value: AStringGrid): AError;
-begin
-  FBranchGrid := Value;
-  Result := 0;
 end;
 
 function Show2D(): ABool;
@@ -439,38 +349,17 @@ end;
 
 function ShowHelp(): AError;
 begin
-  {$IFDEF VCL}
-  try
-    Result := CadApp_ShowHelp();
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
+  Result := CadApp_ShowHelp();
 end;
 
 function ShowLegend(): AError;
 begin
-  {$IFDEF VCL}
   Result := CadApp_ShowLegend();
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
 end;
 
 function ShowLegendWin2P(var StrokaUO: APascalString): AError;
 begin
-  {$IFDEF VCL}
-  try
-    CadApp_ShowLegendWin2(StrokaUO);
-    Result := 0;
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
+  Result := CadApp_ShowLegendWin2(StrokaUO);
 end;
 
 function ShowPrintDialog(): AError;
@@ -480,24 +369,12 @@ end;
 
 function ShowPrinterSetupDialog(): AError;
 begin
-  {$IFDEF VCL}
-  Result := AUi_ExecutePrinterSetupDialog();
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
+  Result := CadApp_ShowPrinterSetupDialog();
 end;
 
 function ShowSettingsWin(): AInt;
 begin
-  {$IFDEF VCL}
-  try
-    Result := CadApp_ShowSettingsWin();
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
+  Result := CadApp_ShowSettingsWin();
 end;
 
 end.

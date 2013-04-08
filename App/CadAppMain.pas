@@ -64,6 +64,8 @@ function CadApp_FormResize(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_GetMaxViewPort(): TRect;
 
+function CadApp_GetMouseActiveControl(): AControl; {$ifdef AStdCall}stdcall;{$endif}
+
 // Импортирует данные из файла .dan.
 function CadApp_ImportDan(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -73,7 +75,7 @@ function CadApp_ImportDan2(const FileName: string): Boolean;
 function CadApp_Init(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 {** Выбор катринки для вставки в рисунок }
-function CadApp_InputPic(): ABool; {$ifdef AStdCall}stdcall;{$endif}
+function CadApp_InputPic(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_PaintBoxMouseDown(Button: AMouseButton; Shift: AShiftState; X, Y: AInt): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -109,11 +111,19 @@ function CadApp_SetIsShowAllFigures(Value: ABool): AError; {$ifdef AStdCall}stdc
 
 function CadApp_SetOnAppMessage(Value: CadApp_OnAppMessage_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_SetOnCheckData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnCompileExtData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
 function CadApp_SetOnDataClear(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnFileOpen(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnFileSave(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnImportDataFromXls(Value: CadApp_OnImportDataFromXls_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnNodeFocus(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -131,6 +141,8 @@ function CadApp_SetOnShow2D(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$en
 
 function CadApp_SetOnShowData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_SetOnShowVenSprav(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
 function CadApp_SetPositionBranch(BranchNum: AInt): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 //** Отображает справку по программе.
@@ -139,11 +151,14 @@ function CadApp_ShowHelp(): AError; {$ifdef AStdCall}stdcall;{$endif}
 //** Отображает редактор условных обозначений.
 function CadApp_ShowLegend(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
-//** Отображает редактор условных обозначений.
-procedure CadApp_ShowLegendWin2(var StrokaUO: APascalString);
+{** Отображает редактор условных обозначений }
+function CadApp_ShowLegendWin2(var StrokaUO: APascalString): AError;
 
 {** Отображает диалоговое окно для печати всей схемы }
 function CadApp_ShowPrintDialog(): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+{** Отображает окно выбора и настройки печати }
+function CadApp_ShowPrinterSetupDialog(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 //** Отображает окно с настройками.
 function CadApp_ShowSettingsWin(): AError; {$ifdef AStdCall}stdcall;{$endif}
@@ -319,7 +334,19 @@ end;
 
 function CadApp_GetMaxViewPort(): TRect;
 begin
-  Result := Scene.Coll.GetMaxViewPort(DrawWin.Canvas);
+  try
+    Result := Scene.Coll.GetMaxViewPort(DrawWin.Canvas);
+  except
+    Result.Left := 0;
+    Result.Top := 0;
+    Result.Right := 0;
+    Result.Bottom := 0;
+  end;
+end;
+
+function CadApp_GetMouseActiveControl(): AControl;
+begin
+  Result := CadMainWin_MouseActiveControl;
 end;
 
 function CadApp_ImportDan(): AError;
@@ -439,16 +466,18 @@ begin
 
   FCompileExtDataEvent := AEvent_NewP(0, 'CompileExtData');
 
-  {$IFDEF VCL}
-  DrawWin_Prepare();
-  {$ENDIF VCL}
-
-  FInitialized := True;
-
-  Result := 0;
+  try
+    {$IFDEF VCL}
+    DrawWin_Prepare();
+    {$ENDIF VCL}
+    FInitialized := True;
+    Result := 0;
+  except
+    Result := -1;
+  end;
 end;
 
-function CadApp_InputPic(): ABool;
+function CadApp_InputPic(): AError;
 var
   PicName: string;
   Index: Integer;
@@ -458,7 +487,7 @@ begin
   try
     if not(fPictureSelect.InputPic(Scene.Coll, Index, PicName, IsPic1)) then
     begin
-      Result := False;
+      Result := 1;
       Exit;
     end;
     CadDrawData.IsPic1 := IsPic1;
@@ -467,12 +496,12 @@ begin
       PicIndex1 := 0
     else
       PicIndex1 := Index;
-    Result := True;
+    Result := 0;
   except
-    Result := False;
+    Result := -1;
   end;
   {$else}
-  Result := False;
+  Result := -1;
   {$endif}
 end;
 
@@ -606,6 +635,18 @@ begin
   Result := 0;
 end;
 
+function CadApp_SetOnCheckData(Value: AProc): AError;
+begin
+  OnCheckData := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnCompileExtData(Value: AProc): AError;
+begin
+  FOnCompileExtData := Value;
+  Result := 0;
+end;
+
 function CadApp_SetOnDataClear(Value: AProc): AError;
 begin
   FOnDataClear := Value;
@@ -621,6 +662,18 @@ end;
 function CadApp_SetOnFileSave(Value: AProc): AError;
 begin
   OnFileSave := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError;
+begin
+  FOnImportDataOk := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnImportDataFromXls(Value: CadApp_OnImportDataFromXls_Proc): AError;
+begin
+  FOnImportDataFromXls := Value;
   Result := 0;
 end;
 
@@ -672,6 +725,12 @@ begin
   Result := 0;
 end;
 
+function CadApp_SetOnShowVenSprav(Value: AProc): AError;
+begin
+  OnShowVenSprav := Value;
+  Result := 0;
+end;
+
 function CadApp_SetPositionBranch(BranchNum: AInt): AError;
 begin
   {$ifdef Vcl}
@@ -713,17 +772,22 @@ begin
   {$endif}
 end;
 
-procedure CadApp_ShowLegendWin2(var StrokaUO: APascalString);
+function CadApp_ShowLegendWin2(var StrokaUO: APascalString): AError;
 var
   Form: TLegendForm;
 begin
-  Form := TLegendForm.Create(nil);
   try
-    Form.Init(StrokaUO);
-    if (Form.ShowModal = mrOk) then
-      StrokaUO := Form.EditorUO.Text;
-  finally
-    Form.Free();
+    Form := TLegendForm.Create(nil);
+    try
+      Form.Init(StrokaUO);
+      if (Form.ShowModal = mrOk) then
+        StrokaUO := Form.EditorUO.Text;
+    finally
+      Form.Free();
+    end;
+    Result := 0;
+  except
+    Result := -1;
   end;
 end;
 
@@ -741,6 +805,15 @@ begin
   {$ENDIF VCL}
 end;
 
+function CadApp_ShowPrinterSetupDialog(): AError;
+begin
+  {$IFDEF VCL}
+  Result := AUi_ExecutePrinterSetupDialog();
+  {$ELSE}
+  Result := -1;
+  {$ENDIF VCL}
+end;
+
 function CadApp_ShowSettingsWin(): AError;
 {$IFDEF VCL}
 var
@@ -748,101 +821,105 @@ var
   Coll: TGCollFigure;
 {$ENDIF VCL}
 begin // Вызов диалога  - Опции
-  Result := 0;
- {$IFDEF VCL}
-  Coll := Scene.Coll;
-  SettingsForm := TSettingsForm.Create(nil);
   try
-    SettingsForm.SetColSettings(ColSettings);
-    SettingsForm.Init();
-    if (SettingsForm.ShowModal = mrOK) then
-    begin
-      SettingsForm.GetColSettings(ColSettings);
-      DrawWin_ApplyScheme(Scene.GetCurrentSchemeIndex());
-      PhotoPathStr := SettingsForm.GetPhotoPath;
-      CadDraw_SetPhotoPathIsDefault(SettingsForm.CheckBoxFoto.Checked);
-      PlaPathStr := SettingsForm.PlaPath.Text;
+    Result := 0;
+    {$ifdef Vcl}
+    Coll := Scene.Coll;
+    SettingsForm := TSettingsForm.Create(nil);
+    try
+      SettingsForm.SetColSettings(ColSettings);
+      SettingsForm.Init();
+      if (SettingsForm.ShowModal = mrOK) then
+      begin
+        SettingsForm.GetColSettings(ColSettings);
+        DrawWin_ApplyScheme(Scene.GetCurrentSchemeIndex());
+        PhotoPathStr := SettingsForm.GetPhotoPath;
+        CadDraw_SetPhotoPathIsDefault(SettingsForm.CheckBoxFoto.Checked);
+        PlaPathStr := SettingsForm.PlaPath.Text;
 
-      if (Coll.StepGrid <= 0) then
-        Coll.StepGrid := 5;
-      ExtheightCons := Coll.Extheight;
+        if (Coll.StepGrid <= 0) then
+          Coll.StepGrid := 5;
+        ExtheightCons := Coll.Extheight;
 
-      oPrVisibleQ := SettingsForm.PrRash.Checked;
-      oPrVisibleS := SettingsForm.PrSechenie.Checked;
-      oPrVisibleV := SettingsForm.PrSpeed.Checked;
-      oPrVisibleL := SettingsForm.PrLength.Checked;
-      Coll.PrRectVisible := SettingsForm.PrRectEnable.Checked;
-      // цвет прямоугольника свойств
-      Coll.PrColorAll := SettingsForm.ColorPrRect.Color;
-      Coll.PrDefaultWidth := SettingsForm.UpDownPr.Position;
+        oPrVisibleQ := SettingsForm.PrRash.Checked;
+        oPrVisibleS := SettingsForm.PrSechenie.Checked;
+        oPrVisibleV := SettingsForm.PrSpeed.Checked;
+        oPrVisibleL := SettingsForm.PrLength.Checked;
+        Coll.PrRectVisible := SettingsForm.PrRectEnable.Checked;
+        // цвет прямоугольника свойств
+        Coll.PrColorAll := SettingsForm.ColorPrRect.Color;
+        Coll.PrDefaultWidth := SettingsForm.UpDownPr.Position;
 
-      Coll.CalcVisible(DrawWin.MsxAll.Checked, Scene.GetCurrentSchemeIndex());
-      DrawWin.cbLayer.Items := SettingsForm.lbLayers.Items;
-      DrawWin.cbLayer.ItemIndex := SettingsForm.lbLayers.ItemIndex;
-      if (DrawWin.cbLayer.ItemIndex < 0) then
-        DrawWin.cbLayer.ItemIndex := 0;
-      DrawWin_RefreshDrawAndState;
-      CadData.IsModify := True;
+        Coll.CalcVisible(DrawWin.MsxAll.Checked, Scene.GetCurrentSchemeIndex());
+        DrawWin.cbLayer.Items := SettingsForm.lbLayers.Items;
+        DrawWin.cbLayer.ItemIndex := SettingsForm.lbLayers.ItemIndex;
+        if (DrawWin.cbLayer.ItemIndex < 0) then
+          DrawWin.cbLayer.ItemIndex := 0;
+        DrawWin_RefreshDrawAndState;
+        CadData.IsModify := True;
 
-      DrawWin_RefreshMenuBranchTypes(AMenuItem(DrawWin.mTipV));
-      DrawWin_RefreshMenuPl();
+        DrawWin_RefreshMenuBranchTypes(AMenuItem(DrawWin.mTipV));
+        DrawWin_RefreshMenuPl();
 
-      Check00 := SettingsForm.CheckBox00.Checked;
-      Check01 := SettingsForm.CheckBox01.Checked;
-      Check02 := SettingsForm.CheckBox02.Checked;
-      Check03 := SettingsForm.CheckBox03.Checked;
-      Check04 := SettingsForm.CheckBox04.Checked;
-      Check05 := SettingsForm.CheckBox05.Checked;
-      Check06 := SettingsForm.CheckBox06.Checked;
-      Check07 := SettingsForm.CheckBox07.Checked;
-      Check08 := SettingsForm.CheckBox08.Checked;
-      Check09 := SettingsForm.CheckBox09.Checked;
-      Check10 := SettingsForm.CheckBox10.Checked;
-      Check11 := SettingsForm.CheckBox11.Checked;
-      Check12 := SettingsForm.CheckBox12.Checked;
-      Check13 := SettingsForm.CheckBox13.Checked;
-      Check14 := SettingsForm.CheckBox14.Checked;
-      Check15 := SettingsForm.CheckBox15.Checked;
-      Check16 := SettingsForm.CheckBox16.Checked;
-      Check17 := SettingsForm.CheckBox17.Checked;
-      Check18 := SettingsForm.CheckBox18.Checked;
-      Check19 := SettingsForm.CheckBox19.Checked;
-      Check20 := SettingsForm.CheckBox20.Checked;
-      Check21 := SettingsForm.CheckBox21.Checked;
-      Check22 := SettingsForm.CheckBox22.Checked;
+        Check00 := SettingsForm.CheckBox00.Checked;
+        Check01 := SettingsForm.CheckBox01.Checked;
+        Check02 := SettingsForm.CheckBox02.Checked;
+        Check03 := SettingsForm.CheckBox03.Checked;
+        Check04 := SettingsForm.CheckBox04.Checked;
+        Check05 := SettingsForm.CheckBox05.Checked;
+        Check06 := SettingsForm.CheckBox06.Checked;
+        Check07 := SettingsForm.CheckBox07.Checked;
+        Check08 := SettingsForm.CheckBox08.Checked;
+        Check09 := SettingsForm.CheckBox09.Checked;
+        Check10 := SettingsForm.CheckBox10.Checked;
+        Check11 := SettingsForm.CheckBox11.Checked;
+        Check12 := SettingsForm.CheckBox12.Checked;
+        Check13 := SettingsForm.CheckBox13.Checked;
+        Check14 := SettingsForm.CheckBox14.Checked;
+        Check15 := SettingsForm.CheckBox15.Checked;
+        Check16 := SettingsForm.CheckBox16.Checked;
+        Check17 := SettingsForm.CheckBox17.Checked;
+        Check18 := SettingsForm.CheckBox18.Checked;
+        Check19 := SettingsForm.CheckBox19.Checked;
+        Check20 := SettingsForm.CheckBox20.Checked;
+        Check21 := SettingsForm.CheckBox21.Checked;
+        Check22 := SettingsForm.CheckBox22.Checked;
 
-      Col00 := SettingsForm.edtCol00.Text;
-      Col01 := SettingsForm.edtCol01.Text;
-      Col02 := SettingsForm.edtCol02.Text;
-      Col03 := SettingsForm.edtCol03.Text;
-      Col04 := SettingsForm.edtCol04.Text;
-      Col05 := SettingsForm.edtCol05.Text;
-      Col06 := SettingsForm.edtCol06.Text;
-      Col07 := SettingsForm.edtCol07.Text;
-      Col08 := SettingsForm.edtCol08.Text;
-      Col09 := SettingsForm.edtCol09.Text;
-      Col10 := SettingsForm.edtCol10.Text;
-      Col11 := SettingsForm.edtCol11.Text;
-      Col12 := SettingsForm.edtCol12.Text;
-      Col13 := SettingsForm.edtCol13.Text;
-      Col14 := SettingsForm.edtCol14.Text;
-      Col15 := SettingsForm.edtCol15.Text;
-      Col16 := SettingsForm.edtCol16.Text;
-      Col17 := SettingsForm.edtCol17.Text;
-      Col18 := SettingsForm.edtCol18.Text;
-      Col19 := SettingsForm.edtCol19.Text;
-      Col20 := SettingsForm.edtCol20.Text;
-      Col21 := SettingsForm.edtCol21.Text;
-      Col22 := SettingsForm.edtCol22.Text;
+        Col00 := SettingsForm.edtCol00.Text;
+        Col01 := SettingsForm.edtCol01.Text;
+        Col02 := SettingsForm.edtCol02.Text;
+        Col03 := SettingsForm.edtCol03.Text;
+        Col04 := SettingsForm.edtCol04.Text;
+        Col05 := SettingsForm.edtCol05.Text;
+        Col06 := SettingsForm.edtCol06.Text;
+        Col07 := SettingsForm.edtCol07.Text;
+        Col08 := SettingsForm.edtCol08.Text;
+        Col09 := SettingsForm.edtCol09.Text;
+        Col10 := SettingsForm.edtCol10.Text;
+        Col11 := SettingsForm.edtCol11.Text;
+        Col12 := SettingsForm.edtCol12.Text;
+        Col13 := SettingsForm.edtCol13.Text;
+        Col14 := SettingsForm.edtCol14.Text;
+        Col15 := SettingsForm.edtCol15.Text;
+        Col16 := SettingsForm.edtCol16.Text;
+        Col17 := SettingsForm.edtCol17.Text;
+        Col18 := SettingsForm.edtCol18.Text;
+        Col19 := SettingsForm.edtCol19.Text;
+        Col20 := SettingsForm.edtCol20.Text;
+        Col21 := SettingsForm.edtCol21.Text;
+        Col22 := SettingsForm.edtCol22.Text;
 
-      if Assigned(OnSaveConfig) then
-        OnSaveConfig();
+        if Assigned(OnSaveConfig) then
+          OnSaveConfig();
+      end;
+    finally
+      SettingsWin_Fin();
+      SettingsForm.Free;
     end;
-  finally
-    SettingsWin_Fin();
-    SettingsForm.Free;
+    {$endif Vcl}
+  except
+    Result := -1;
   end;
- {$ENDIF VCL}
 end;
 
 end.

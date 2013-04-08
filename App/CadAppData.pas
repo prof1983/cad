@@ -9,7 +9,11 @@ unit CadAppData;
 interface
 
 uses
-  ABase, AUiBase, CadAppBase, CadCoreBase, CadDrawBase;
+  ABase,
+  AUiBase,
+  CadAppBase,
+  CadCoreBase,
+  CadDrawBase;
 
 var
   {** Data update event }
@@ -21,12 +25,14 @@ var
 
   NameVar_Text: APascalString;
 
-  OnAppMessage: CadApp_OnAppMessage_Proc;
+var OnAppMessage: CadApp_OnAppMessage_Proc;
+
+var OnCheckData: AProc;
+
+  FOnCompileExtData: AProc;
 
   {** Event fires when needed clean data }
   FOnDataClear: AProc;
-
-  FOnCompileExtData: AProc;
 
   OnFileOpen: AProc;
 
@@ -39,13 +45,13 @@ var
 
   FOnNodeFocus: AProc;
 
-  OnPaintBoxMouseDown: AProc;
+var OnPaintBoxMouseDown: AProc;
 
-  OnPlaClick: AProc;
+var OnPlaClick: AProc;
 
-  OnRefreshParams: AProc;
+var OnRefreshParams: AProc;
 
-  OnSaveConfig: AProc;
+var OnSaveConfig: AProc;
 
   {** Event fires when required in the table with data set pointer to the desired item
       Obj - Table num (0-Branchs, 1-Nodes)
@@ -54,26 +60,28 @@ var
 
   FOnShow2D: AProc;
 
-  OnShowData: AProc;
+var OnShowData: AProc;
 
-  DocDirectory: APascalString;
+var OnShowVenSprav: AProc;
 
-  {** True if the window rendering is in the closing }
-  DrawWin_IsClosing1: Boolean;
+var DocDirectory: APascalString;
 
-  MainMenu: AMenu;
-  MainFileMenu: AMenuItem;
-  MainTaskMenu: AMenuItem;
-  MainViewMenu: AMenuItem;
+{** True if the window rendering is in the closing }
+var DrawWin_IsClosing1: Boolean;
 
-  {** View the display circuitry }
-  ViewMode: TCadAppViewMode;
+var MainMenu: AMenu;
+var MainFileMenu: AMenuItem;
+var MainTaskMenu: AMenuItem;
+var MainViewMenu: AMenuItem;
 
-  {** The main element of rendering graphics }
-  PaintBoxCanvas: ACanvas;
+{** View the display circuitry }
+var ViewMode: TCadAppViewMode;
 
-  {** Interface to external data }
-  TablData_IsModyfid: Boolean;
+{** The main element of rendering graphics }
+var PaintBoxCanvas: ACanvas;
+
+{** Interface to external data }
+var TablData_IsModyfid: Boolean;
 
   {** Branchs }
   FBranchGrid: AStringGrid;
@@ -145,6 +153,9 @@ var Col19: APascalString;
 var Col20: APascalString;
 var Col21: APascalString;
 var Col22: APascalString;
+
+{** The item above which there is a mouse pointer }
+var CadMainWin_MouseActiveControl: AControl;
 
 implementation
 
