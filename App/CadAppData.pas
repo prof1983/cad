@@ -2,7 +2,7 @@
 @Abstract Cad.App data
 @Author Prof1983 <prof1983@ya.ru>
 @Created 02.07.2009
-@LastMod 21.03.2013
+@LastMod 08.04.2013
 }
 unit CadAppData;
 
@@ -21,10 +21,16 @@ var
 
   NameVar_Text: APascalString;
 
+  OnAppMessage: CadApp_OnAppMessage_Proc;
+
   {** Event fires when needed clean data }
   FOnDataClear: AProc;
 
   FOnCompileExtData: AProc;
+
+  OnFileOpen: AProc;
+
+  OnFileSave: AProc;
 
   {** Event fires when importing data from Xls file }
   FOnImportDataFromXls: CadApp_OnImportDataFromXls_Proc;
@@ -33,7 +39,11 @@ var
 
   FOnNodeFocus: AProc;
 
-  FOnSaveFile: CadApp_OnSaveFile_Proc;
+  OnPaintBoxMouseDown: AProc;
+
+  OnPlaClick: AProc;
+
+  OnSaveConfig: AProc;
 
   {** Event fires when required in the table with data set pointer to the desired item
       Obj - Table num (0-Branchs, 1-Nodes)
@@ -41,6 +51,8 @@ var
   FOnSetPosition: ACallbackProc;
 
   FOnShow2D: AProc;
+
+  OnShowData: AProc;
 
   DocDirectory: APascalString;
 

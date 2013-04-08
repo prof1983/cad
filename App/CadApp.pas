@@ -2,7 +2,7 @@
 @Abstract Cad.App
 @Author Prof1983 <prof1983@ya.ru>
 @Created 30.11.2009
-@LastMod 28.03.2013
+@LastMod 08.04.2013
 }
 unit CadApp;
 
@@ -105,9 +105,6 @@ function SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError; stdcall;
 
 {** Задает реакцию на событие OnDrawWinInit }
 function SetOnDrawWinInit(Value: AProc): AError; stdcall;
-
-{** Задает реакцию на событие OnSaveFile }
-function SetOnSaveFile(Value: CadApp_OnSaveFile_Proc): AError; stdcall;
 
 {** Устанавливает курсор на указанную ветвь }
 function SetPositionBranch(BranchNum: AInt): AError; stdcall;
@@ -396,12 +393,6 @@ end;
 function SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError;
 begin
   FOnImportDataOk := Value;
-  Result := 0;
-end;
-
-function SetOnSaveFile(Value: CadApp_OnSaveFile_Proc): AError;
-begin
-  FOnSaveFile := Value;
   Result := 0;
 end;
 
