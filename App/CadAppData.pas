@@ -15,50 +15,57 @@ uses
   CadCoreBase,
   CadDrawBase;
 
-var
   {** Data update event }
-  FCompileExtDataEvent: AEvent;
+var CompileExtDataEvent: AEvent;
 
   FIsShowAllFigures: Boolean;
 
-  NameSh_Text: APascalString;
+var NameSh_Text: APascalString;
 
-  NameVar_Text: APascalString;
+var NameVar_Text: APascalString;
 
 var OnAppMessage: CadApp_OnAppMessage_Proc;
 
+var OnCalcFireCurrent: AProc;
+
+var OnCalcFireStability: AProc;
+
 var OnCheckData: AProc;
 
-  FOnCompileExtData: AProc;
+var OnCompileExtData: AProc;
 
-  {** Event fires when needed clean data }
-  FOnDataClear: AProc;
+{** Event fires when needed clean data }
+var OnDataClear: AProc;
 
-  OnFileOpen: AProc;
+var OnFileOpen: AProc;
 
-  OnFileSave: AProc;
+var OnFileSave: AProc;
 
-  {** Event fires when importing data from Xls file }
-  FOnImportDataFromXls: CadApp_OnImportDataFromXls_Proc;
+var OnGenData: AProc;
 
-  FOnImportDataOk: CadApp_OnImportDataOk_Proc;
+{** Event fires when importing data from Xls file }
+var OnImportDataFromXls: CadApp_OnImportDataFromXls_Proc;
 
-  FOnNodeFocus: AProc;
+var OnImportDataOk: CadApp_OnImportDataOk_Proc;
+
+var OnNodeFocus: AProc;
 
 var OnPaintBoxMouseDown: AProc;
 
 var OnPlaClick: AProc;
 
+var OnRecover: AProc;
+
 var OnRefreshParams: AProc;
+
+var OnRefreshTitle: AProc;
 
 var OnSaveConfig: AProc;
 
-  {** Event fires when required in the table with data set pointer to the desired item
-      Obj - Table num (0-Branchs, 1-Nodes)
-      Data - Element (branch/node) num }
-  FOnSetPosition: ACallbackProc;
+{** Event fires when required in the table with data set pointer to the desired item }
+var OnSetPosition: ACallbackProc;
 
-  FOnShow2D: AProc;
+var OnShow2D: AProc;
 
 var OnShowData: AProc;
 
@@ -83,26 +90,26 @@ var PaintBoxCanvas: ACanvas;
 {** Interface to external data }
 var TablData_IsModyfid: Boolean;
 
-  {** Branchs }
-  FBranchGrid: AStringGrid;
+{** Branchs }
+var BranchGrid: AStringGrid;
 
-  {** Nodes }
-  FNodeGrid: AStringGrid;
+{** Nodes }
+var NodeGrid: AStringGrid;
 
-  {** Ventilators }
-  FVenGrid: AStringGrid;
+{** Ventilators }
+var VenGrid: AStringGrid;
 
-  {** Stolb }
-  FBlockGrid: AStringGrid;
+{** Stolb }
+var BlockGrid: AStringGrid;
 
-  {** Worker ways }
-  FWayWorkerGrid: AStringGrid;
+{** Worker ways }
+var WayWorkerGrid: AStringGrid;
 
-  {** Saver ways }
-  FWaySaverGrid: AStringGrid;
+{** Saver ways }
+var WaySaverGrid: AStringGrid;
 
-  {** The developed space }
-  FVpGrid: AStringGrid;
+{** The developed space }
+var VpGrid: AStringGrid;
 
 // Settings - Table - Columns for print
 

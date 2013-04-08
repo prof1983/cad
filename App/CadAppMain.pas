@@ -36,7 +36,7 @@ uses
   CadDrawScene,
   CadDrawTypes,
   CadStampData,
-  fLegend, fPictureSelect, fPrint;
+  fDrawWin, fLegend, fPictureSelect, fPrint;
 
 // --- CadApp ---
 
@@ -90,6 +90,8 @@ function CadApp_Prepare(): AError; {$ifdef AStdCall}stdcall;{$endif}
 {** Обновляет размеры области рисования на главной форме }
 function CadApp_RefreshPaintBoxSize(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_RefreshTitle(): AError; {$ifdef AStdCall}stdcall;{$endif}
+
 { Сохраняет схему и данные в файл
   FileName - Имя сохраняемого файла
   StrokaDan - Строка с данными
@@ -111,6 +113,10 @@ function CadApp_SetIsShowAllFigures(Value: ABool): AError; {$ifdef AStdCall}stdc
 
 function CadApp_SetOnAppMessage(Value: CadApp_OnAppMessage_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_SetOnCalcFireCurrent(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnCalcFireStability(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
 function CadApp_SetOnCheckData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnCompileExtData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
@@ -120,6 +126,8 @@ function CadApp_SetOnDataClear(Value: AProc): AError; {$ifdef AStdCall}stdcall;{
 function CadApp_SetOnFileOpen(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnFileSave(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnGenData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -131,7 +139,11 @@ function CadApp_SetOnPaintBoxMouseDown(Value: AProc): AError; {$ifdef AStdCall}s
 
 function CadApp_SetOnPlaClick(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_SetOnRecover(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
 function CadApp_SetOnRefreshParams(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnRefreshTitle(Value: AProc): AError;
 
 function CadApp_SetOnSaveConfig(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -163,13 +175,17 @@ function CadApp_ShowPrinterSetupDialog(): AError; {$ifdef AStdCall}stdcall;{$end
 //** Отображает окно с настройками.
 function CadApp_ShowSettingsWin(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+// --- Vars ---
+
+{** Главная форма приложения }
+var DrawWin: TDrawWin;
+
 implementation
 
 uses
   Controls,
   Grids,
   Windows,
-  fDrawWin,
   fSettings;
 
 var
@@ -222,8 +238,8 @@ begin
     if IsSxema3D then
     begin
       // Отображаем 2D cхему
-      if Assigned(FOnShow2D) then
-        FOnShow2D();
+      if Assigned(OnShow2D) then
+        OnShow2D();
     end;
 
     if IsFullClear then
@@ -385,8 +401,8 @@ begin
     end;
     CloseFile(f);
 
-    if Assigned(FOnImportDataOk) then
-      FOnImportDataOk(S);
+    if Assigned(OnImportDataOk) then
+      OnImportDataOk(S);
   end;
 end;
 
@@ -464,7 +480,7 @@ begin
 
   // ---
 
-  FCompileExtDataEvent := AEvent_NewP(0, 'CompileExtData');
+  CompileExtDataEvent := AEvent_NewP(0, 'CompileExtData');
 
   try
     {$IFDEF VCL}
@@ -535,8 +551,8 @@ begin
     Pnar := '';
     Psh := '';
     {$ifdef Vcl}
-    PreobrDanStr(StrokaDan, Version, TStringGrid(FBranchGrid), TStringGrid(FNodeGrid), TStringGrid(FVenGrid),
-        TStringGrid(FWayWorkerGrid), TStringGrid(FWaySaverGrid), TStringGrid(FVpGrid), IsDan,
+    PreobrDanStr(StrokaDan, Version, TStringGrid(BranchGrid), TStringGrid(NodeGrid), TStringGrid(VenGrid),
+        TStringGrid(WayWorkerGrid), TStringGrid(WaySaverGrid), TStringGrid(VpGrid), IsDan,
         EdIzm, Precision, StampData,
         NameSh, NameVar, NodeSurface, Tnar, Tsh, Pnar, Psh);
     {$endif}
@@ -565,6 +581,24 @@ end;
 function CadApp_RefreshPaintBoxSize(): AError;
 begin
   Result := CadApp_RefreshPaintBoxSize2(AImage(DrawWin.PaintBox1));
+end;
+
+function CadApp_RefreshTitle(): AError;
+var
+  Title: string;
+begin
+  try
+    Title := ASystem_GetTitleP();
+    if (DrawFileName <> '') then
+      DrawWin.Caption := DrawFileName + ' - ' + Title
+    else
+      DrawWin.Caption := Title;
+    if Assigned(OnRefreshTitle) then
+      OnRefreshTitle();
+    Result := 0;
+  except
+    Result := -1;
+  end;
 end;
 
 function CadApp_SaveFileExP(const FileName, StrokaDan, StrokaUo: APascalString; Version: AInt): AInt;
@@ -604,22 +638,22 @@ end;
 
 function CadApp_SetGrids(BranchGrid, NodeGrid, VenGrid: AStringGrid): AError;
 begin
-  FBranchGrid := BranchGrid;
-  FNodeGrid := NodeGrid;
-  FVenGrid := VenGrid;
+  CadAppData.BranchGrid := BranchGrid;
+  CadAppData.NodeGrid := NodeGrid;
+  CadAppData.VenGrid := VenGrid;
   Result := 0;
 end;
 
 function CadApp_SetGrids_Vp(VpGrid: AStringGrid): AError;
 begin
-  FVpGrid := VpGrid;
+  CadAppData.VpGrid := VpGrid;
   Result := 0;
 end;
 
 function CadApp_SetGrids_Way(WayWorkerGrid, WaySaverGrid: AStringGrid): AError;
 begin
-  FWayWorkerGrid := WayWorkerGrid;
-  FWaySaverGrid := WaySaverGrid;
+  CadAppData.WayWorkerGrid := WayWorkerGrid;
+  CadAppData.WaySaverGrid := WaySaverGrid;
   Result := 0;
 end;
 
@@ -635,6 +669,18 @@ begin
   Result := 0;
 end;
 
+function CadApp_SetOnCalcFireCurrent(Value: AProc): AError;
+begin
+  OnCalcFireCurrent := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnCalcFireStability(Value: AProc): AError;
+begin
+  OnCalcFireStability := Value;
+  Result := 0;
+end;
+
 function CadApp_SetOnCheckData(Value: AProc): AError;
 begin
   OnCheckData := Value;
@@ -643,13 +689,13 @@ end;
 
 function CadApp_SetOnCompileExtData(Value: AProc): AError;
 begin
-  FOnCompileExtData := Value;
+  OnCompileExtData := Value;
   Result := 0;
 end;
 
 function CadApp_SetOnDataClear(Value: AProc): AError;
 begin
-  FOnDataClear := Value;
+  OnDataClear := Value;
   Result := 0;
 end;
 
@@ -665,21 +711,27 @@ begin
   Result := 0;
 end;
 
+function CadApp_SetOnGenData(Value: AProc): AError;
+begin
+  OnGenData := Value;
+  Result := 0;
+end;
+
 function CadApp_SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError;
 begin
-  FOnImportDataOk := Value;
+  OnImportDataOk := Value;
   Result := 0;
 end;
 
 function CadApp_SetOnImportDataFromXls(Value: CadApp_OnImportDataFromXls_Proc): AError;
 begin
-  FOnImportDataFromXls := Value;
+  OnImportDataFromXls := Value;
   Result := 0;
 end;
 
 function CadApp_SetOnNodeFocus(Value: AProc): AError;
 begin
-  FOnNodeFocus := Value;
+  OnNodeFocus := Value;
   Result := 0;
 end;
 
@@ -695,9 +747,21 @@ begin
   Result := 0;
 end;
 
+function CadApp_SetOnRecover(Value: AProc): AError;
+begin
+  OnRecover := Value;
+  Result := 0;
+end;
+
 function CadApp_SetOnRefreshParams(Value: AProc): AError;
 begin
   OnRefreshParams := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnRefreshTitle(Value: AProc): AError;
+begin
+  OnRefreshTitle := Value;
   Result := 0;
 end;
 
@@ -709,13 +773,13 @@ end;
 
 function CadApp_SetOnSetPosition(Value: ACallbackProc): AError;
 begin
-  FOnSetPosition := Value;
+  OnSetPosition := Value;
   Result := 0;
 end;
 
 function CadApp_SetOnShow2D(Value: AProc): AError;
 begin
-  FOnShow2D := Value;
+  OnShow2D := Value;
   Result := 0;
 end;
 

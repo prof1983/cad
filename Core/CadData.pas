@@ -2,7 +2,7 @@
 @Abstract Общие переменные для Cad
 @Author Prof1983 <prof1983@ya.ru>
 @Created 02.07.2009
-@LastMod 14.03.2013
+@LastMod 08.04.2013
 
      ===========
      | CadData |
@@ -37,16 +37,6 @@ type
     Name: string;          // Наименование ветви
   end;
 
-var
-  DrawFlag: AInt;
-  {** Имя файла }
-  DrawFileName: APascalString;
-  IsModify: Boolean;
-  CadImgPath: string;
-  StrokaUO: APascalString;
-  {** Имя открываемого файла }
-  OrigFileName: string;
-
 type
   TExDataNodeRec = record
     Nd0: Integer; // 0 - Items[I].NdNum - номер узла
@@ -64,6 +54,22 @@ type
     NumNode: Integer;
     PolyCoord: array of TPoint;
   end;
+
+// --- Vars ---
+
+var DrawFlag: AInt;
+
+{** Имя файла }
+var DrawFileName: APascalString;
+
+var IsModify: Boolean;
+
+var CadImgPath: APascalString;
+
+var StrokaUo: APascalString;
+
+{** Имя открываемого файла }
+var OrigFileName: string;
 
 var
   {** Передача полилиний }

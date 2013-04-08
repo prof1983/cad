@@ -2,7 +2,7 @@
 @Abstract Cad.App - DataUtils
 @Author Prof1983 <prof1983@ya.ru>
 @Created 13.08.2009
-@LastMod 14.03.2013
+@LastMod 08.04.2013
 
                        ----------
                        | CadApp |
@@ -130,8 +130,8 @@ begin
     Grid.Selection := SRect;
   end;
 {$ENDIF VCL}
-  if Assigned(FOnNodeFocus) then
-    FOnNodeFocus();
+  if Assigned(OnNodeFocus) then
+    OnNodeFocus();
 end;
 
 // --- Data ---
@@ -148,9 +148,9 @@ end;
 function Data_Branch_SetPosition(BranchNum: AInt): AError;
 begin
   try
-    CadAppDataUtils.Data_Branch_SetPositionA(FBranchGrid, BranchNum);
-    if Assigned(FOnSetPosition) then
-      Result := FOnSetPosition(0, BranchNum)
+    CadAppDataUtils.Data_Branch_SetPositionA(BranchGrid, BranchNum);
+    if Assigned(OnSetPosition) then
+      Result := OnSetPosition(0, BranchNum)
     else
       Result := 0;
   except
@@ -199,11 +199,11 @@ end;
 function Data_Clear(): AError;
 begin
   try
-    AUiGrid_Clear(FBranchGrid);
-    AUiGrid_Clear(FNodeGrid);
-    AUiGrid_Clear(FVenGrid);
-    if Assigned(FOnDataClear) then
-      Result := FOnDataClear()
+    AUiGrid_Clear(BranchGrid);
+    AUiGrid_Clear(NodeGrid);
+    AUiGrid_Clear(VenGrid);
+    if Assigned(OnDataClear) then
+      Result := OnDataClear()
     else
       Result := 0;
   except
@@ -322,17 +322,17 @@ end;
 
 function Data_FindBranch(BranchNum: AInt): AInt;
 begin
-  Result := AUiGrid_FindInt(FBranchGrid, 0, BranchNum);
+  Result := AUiGrid_FindInt(BranchGrid, 0, BranchNum);
 end;
 
 function Data_FindNode(NodeNum: AInt): AInt;
 begin
-  Result := AUiGrid_FindInt(FNodeGrid, 0, NodeNum);
+  Result := AUiGrid_FindInt(NodeGrid, 0, NodeNum);
 end;
 
 function Data_FindStolb(Num: AInt): AInt;
 begin
-  Result := AUiGrid_FindInt(FBlockGrid, 0, Num);
+  Result := AUiGrid_FindInt(BlockGrid, 0, Num);
 end;
 
 function Data_FindVenA(TablVen1: AStringGrid; NomVetvi: Integer): Integer;
@@ -369,7 +369,7 @@ end;
 function Data_Node_SetPosition(NodeNum: AInt): AError;
 begin
   try
-    _SetNodePosition(FNodeGrid, NodeNum);
+    _SetNodePosition(NodeGrid, NodeNum);
     Result := 0;
   except
     Result := -1;
@@ -456,7 +456,7 @@ end;
 
 function Data_Stolb_SetPosition(StolbNum: AInt): AError;
 begin
-  _SetNodePosition(FBlockGrid, StolbNum);
+  _SetNodePosition(BlockGrid, StolbNum);
   Result := 0;
 end;
 
