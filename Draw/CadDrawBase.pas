@@ -2,7 +2,7 @@
 @Abstract Cad.Draw base consts and types
 @Author Prof1983 <prof1983@ya.ru>
 @Created 07.04.2011
-@LastMod 26.02.2013
+@LastMod 09.04.2013
 }
 unit CadDrawBase;
 
@@ -19,6 +19,10 @@ type
 
 type
   AGFigure = type AInt; // TGCustomFigure
+
+type AGFigureCollection = type AInt; // TGCollFigure
+
+type AGScene = type AInt; // TGScene
 
 type
   TSchemeIndex = type Integer;

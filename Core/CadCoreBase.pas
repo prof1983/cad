@@ -2,7 +2,7 @@
 @Abstract Cad.Core base consts and types
 @Author Prof1983 <prof1983@ya.ru>
 @Created 25.11.2009
-@LastMod 26.02.2013
+@LastMod 09.04.2013
 }
 unit CadCoreBase;
 
@@ -63,6 +63,56 @@ const
 
 type
   TCadLogProc = ABaseTypes.AAddToLogA_Proc;
+
+type
+  TBranchIrs = record
+    {** Номер ветви }
+    BranchNum: AInt;
+    {** Номер узла начала ветви }
+    NodeNum1: AInt;
+    {** Номер узла конца ветви }
+    NodeNum2: AInt;
+    {** Позиция ПЛА }
+    PlaNum: AInt;
+    {** Цвет позиции ПЛА }
+    PlaColor: AInt;
+    {** Цвет стрелки (свежая, исходящая) (0(False)-clBlue else 1(True)-clRed) }
+    ArrowIsFresh: AInt;
+    {** Тип линии (1,14 - Пунктирная (штриховая)) // тип выработки }
+    LineType7: AInt;
+    {** Наименование ветви }
+    Name: string;
+  end;
+
+type
+  TExDataNodeRec = record
+    // 0 - Items[I].NdNum - номер узла
+    Nd0: AInt;
+    // 1 - Items[I].NdPnt.X - координаты узла
+    Nd1: AInt;
+    // 2 - Items[I].NdPnt.Y - координаты узла
+    Nd2: AInt;
+    // 3 - Items[I].NdPntZ - координаты узла
+    Nd3: AInt;
+    // 4 - Items[I].NdType - узел поверхности или нет
+    Nd4: AInt;
+  end;
+
+type
+  // APoint = TPoint.Type
+  APoint = packed record
+    X: Longint;
+    Y: Longint;
+  end;
+
+type
+  TPolyRec = record
+    {** Номер индекса в массиве Ex_Data_Branch }
+    IndEx: AInt;
+    {** Число узлов полилинии }
+    NumNode: AInt;
+    PolyCoord: array of APoint;
+  end;
 
 implementation
 

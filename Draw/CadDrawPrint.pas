@@ -1,7 +1,7 @@
 {**
 @Author Prof1983 <prof1983@ya.ru>
 @Created 08.08.2011
-@LastMod 22.03.2013
+@LastMod 09.04.2013
 
     -----------
     | CadDraw |
@@ -26,12 +26,13 @@ interface
 uses
   Types,
   ABase,
-  CadDrawBase;
+  CadDrawBase,
+  CadDrawFigureCollection;
 
 {** Выводит изображение на печать.
     @param IsShowAllFigures = CadAppData.IsShowAllFigures
     @param DrawWay - Отрисовывать маршрут вывода людей }
-function CadDraw_Print(const ImgPath: APascalString; FieldRect, MMRect, DocRect: TRect;
+function CadDraw_PrintP(Scene: AGScene; const ImgPath: APascalString; FieldRect, MMRect, DocRect: TRect;
     AirFlag: AInt; IsShowAllFigures, IsPortret, IsBwPrint, PrintStamp, PrintBord: ABool;
     const Format: APascalString; CopiesCount: AInt): AError;
 
@@ -53,7 +54,7 @@ procedure _SetPrinterOrientation(Xf, Yf, ScaleXm, ScaleYm: Integer; IsPortret: B
 
 // --- Private ---
 
-procedure _Print(const ImgPath: string; FieldRect, MMRect, DocRect: TRect; AirFlag: AInteger;
+procedure _Print(Scene: AGScene; const ImgPath: string; FieldRect, MMRect, DocRect: TRect; AirFlag: AInteger;
     IsShowAllFigures, IsDrawWay, IsPortret, IsBWPrint, PrintStamp, PrintBord: Boolean;
     const Format: string; CopiesCount: Integer);
 var
@@ -101,7 +102,7 @@ var
   Yf: Integer; // Высота в миллиметрах
   Coll: TGCollFigure;
 begin
-  Coll := Scene.Coll;
+  Coll := CadDrawScene_GetColl(Scene);
   // Расчитываем окно для печати
   // масштабные коэффициенты
   ScaleX := GetDeviceCaps(Printer.Handle,HORZRES); // Пикселы
@@ -367,12 +368,12 @@ end;
 
 // --- CadDraw ---
 
-function CadDraw_Print(const ImgPath: APascalString; FieldRect, MMRect, DocRect: TRect;
+function CadDraw_PrintP(Scene: AGScene; const ImgPath: APascalString; FieldRect, MMRect, DocRect: TRect;
     AirFlag: AInt; IsShowAllFigures, IsPortret, IsBwPrint, PrintStamp, PrintBord: ABool;
     const Format: APascalString; CopiesCount: AInt): AError;
 begin
   try
-    _Print(ImgPath, FieldRect, MMRect, DocRect, AirFlag,
+    _Print(Scene, ImgPath, FieldRect, MMRect, DocRect, AirFlag,
         IsShowAllFigures, DrawWay, IsPortret, IsBWPrint, PrintStamp, PrintBord,
         Format, CopiesCount);
     Result := 0;

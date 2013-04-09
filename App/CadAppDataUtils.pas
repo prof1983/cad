@@ -37,6 +37,8 @@ uses
   CadAppData,
   CadCoreBase,
   CadDrawBase,
+  CadDrawFigureCollection,
+  CadDrawMain,
   CadDrawPrimitive,
   CadDrawScene;
 
@@ -224,7 +226,7 @@ begin
   DataGrid := TStringGrid(DataGrid1);
   NodesGrid := TStringGrid(NodesGrid1);
   try
-    Coll := Scene.Coll;
+    Coll := CadDraw_GetColl();
     nv := 0;
     if (DataGrid1 <> 0) then
     begin
@@ -393,7 +395,7 @@ begin
     if not(_IsPrit(GenericTable.Cells[3,BranchRow])) then
     begin
       BranchNum := AUtils_StrToIntDefP(GenericTable.Cells[0,BranchRow],0);
-      if (Scene.Coll.FindBranch(BranchNum) < 0) then
+      if (CadDraw_GetColl().FindBranch(BranchNum) < 0) then
       begin
         Result := False;
         if Assigned(LogProc) then

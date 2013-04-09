@@ -1,7 +1,7 @@
 {**
 @Author Prof1983 <prof1983@ya.ru>
 @Created 23.11.2009
-@LastMod 21.02.2013
+@LastMod 09.04.2013
 }
 unit fNavigator;
 
@@ -39,12 +39,12 @@ implementation
 
 procedure TNavigatorForm.FormActivate(Sender: TObject);
 begin
-  RefreshImage(ImageNavigator, CadDraw_GetBackColor(), FDC, Scene.Coll.VP);
+  RefreshImage(ImageNavigator, CadDraw_GetBackColor(), FDC, CadDraw_GetColl().VP);
 end;
 
 procedure TNavigatorForm.ImageNavigatorMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  ImageNavigatorMouseDownA(X, Y, FDC, Scene.Coll.VP);
+  ImageNavigatorMouseDownA(X, Y, FDC, CadDraw_GetColl().VP);
 end;
 
 procedure TNavigatorForm.ImageNavigatorMouseDownA(X, Y: Integer; var DC, VP: TRect);
