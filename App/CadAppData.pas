@@ -40,6 +40,8 @@ var OnCalcTd: AProc;
 
 var OnCheckData: AProc;
 
+var OnCloseQuery: CadApp_OnCloseQuery_Proc;
+
 var OnCompileExtData: AProc;
 
 {** Event fires when needed clean data }
@@ -84,6 +86,10 @@ var OnShowFireProtectView: AProc;
 var OnShowRevBranchs: AProc;
 
 var OnShowVenSprav: AProc;
+
+var OnTaskEr: AProc;
+
+var OnTaskVentDeviceFail: AProc;
 
 var DocDirectory: APascalString;
 

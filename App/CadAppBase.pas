@@ -18,6 +18,7 @@ const
 type
   CadApp_OnAppMessage_Proc = function(var Msg: AUInt; var WParam, LParam: AInt;
       var Handled: ABool): AError; stdcall;
+  CadApp_OnCloseQuery_Proc = function(var CanClose: ABool): AError; stdcall;
   CadApp_OnImportDataFromXls_Proc = function(const FileName: AString_Type; IsAll: ABoolean): AError; stdcall;
   CadApp_OnImportDataOk_Proc = function(const Data: AWideString): AError; stdcall;
 

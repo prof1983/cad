@@ -129,6 +129,8 @@ function CadApp_SetOnCalcTd(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$en
 
 function CadApp_SetOnCheckData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_SetOnCloseQuery(Value: CadApp_OnCloseQuery_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
 function CadApp_SetOnCompileExtData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnDataClear(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
@@ -170,6 +172,10 @@ function CadApp_SetOnShowFireProtectView(Value: AProc): AError; {$ifdef AStdCall
 function CadApp_SetOnShowRevBranchs(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnShowVenSprav(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnTaskEr(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnTaskVentDeviceFail(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetPositionBranch(BranchNum: AInt): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -739,6 +745,12 @@ begin
   Result := 0;
 end;
 
+function CadApp_SetOnCloseQuery(Value: CadApp_OnCloseQuery_Proc): AError;
+begin
+  OnCloseQuery := Value;
+  Result := 0;
+end;
+
 function CadApp_SetOnCompileExtData(Value: AProc): AError;
 begin
   OnCompileExtData := Value;
@@ -862,6 +874,18 @@ end;
 function CadApp_SetOnShowVenSprav(Value: AProc): AError;
 begin
   OnShowVenSprav := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnTaskEr(Value: AProc): AError;
+begin
+  OnTaskEr := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnTaskVentDeviceFail(Value: AProc): AError;
+begin
+  OnTaskVentDeviceFail := Value;
   Result := 0;
 end;
 
