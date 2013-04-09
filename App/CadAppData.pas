@@ -2,7 +2,7 @@
 @Abstract Cad.App data
 @Author Prof1983 <prof1983@ya.ru>
 @Created 02.07.2009
-@LastMod 08.04.2013
+@LastMod 09.04.2013
 }
 unit CadAppData;
 
@@ -18,17 +18,25 @@ uses
   {** Data update event }
 var CompileExtDataEvent: AEvent;
 
-  FIsShowAllFigures: Boolean;
+var IsShowAllFigures: ABool;
 
 var NameSh_Text: APascalString;
 
 var NameVar_Text: APascalString;
 
+var OnActivated: AProc;
+
 var OnAppMessage: CadApp_OnAppMessage_Proc;
 
 var OnCalcFireCurrent: AProc;
 
+var OnCalcFireGas: AProc;
+
+var OnCalcFirePrev: AProc;
+
 var OnCalcFireStability: AProc;
+
+var OnCalcTd: AProc;
 
 var OnCheckData: AProc;
 
@@ -68,6 +76,12 @@ var OnSetPosition: ACallbackProc;
 var OnShow2D: AProc;
 
 var OnShowData: AProc;
+
+var OnShowFire: AProc;
+
+var OnShowFireProtectView: AProc;
+
+var OnShowRevBranchs: AProc;
 
 var OnShowVenSprav: AProc;
 

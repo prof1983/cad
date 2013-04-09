@@ -2,7 +2,7 @@
 @Abstract Cad.App base consts and types
 @Author Prof1983 <prof1983@ya.ru>
 @Created 12.07.2011
-@LastMod 08.04.2013
+@LastMod 09.04.2013
 }
 unit CadAppBase;
 
@@ -43,6 +43,14 @@ type
     CadAppViewMode_OtrVetvi,
     CadAppViewMode_RRegVetvi
     );
+
+const
+  DataPage0 = 0; // Common
+  DataPage1 = 1; // Branchs
+  DataPage2 = 2; // Ventilators
+  DataPage4 = 4;
+  DataPage6 = 6;
+  DataPage7 = 7;
 
 implementation
 

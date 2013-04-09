@@ -2,7 +2,7 @@
 @Abstract Cad.App.Main
 @Author Prof1983 <prof1983@ya.ru>
 @Created 07.09.2011
-@LastMod 08.04.2013
+@LastMod 09.04.2013
 }
 unit CadAppMain;
 
@@ -62,6 +62,8 @@ function CadApp_FormKeyDown(Key: AInt): AError; {$ifdef AStdCall}stdcall;{$endif
 
 function CadApp_FormResize(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_GetIsShowAllFigures(): ABool; {$ifdef AStdCall}stdcall;{$endif}
+
 function CadApp_GetMaxViewPort(): TRect;
 
 function CadApp_GetMouseActiveControl(): AControl; {$ifdef AStdCall}stdcall;{$endif}
@@ -111,11 +113,19 @@ function CadApp_SetGrids_Way(WayWorkerGrid, WaySaverGrid: AStringGrid): AError; 
 
 function CadApp_SetIsShowAllFigures(Value: ABool): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_SetOnActivated(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
 function CadApp_SetOnAppMessage(Value: CadApp_OnAppMessage_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnCalcFireCurrent(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_SetOnCalcFireGas(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnCalcFirePrev(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
 function CadApp_SetOnCalcFireStability(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnCalcTd(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnCheckData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -152,6 +162,12 @@ function CadApp_SetOnSetPosition(Value: ACallbackProc): AError; {$ifdef AStdCall
 function CadApp_SetOnShow2D(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnShowData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnShowFire(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnShowFireProtectView(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnShowRevBranchs(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnShowVenSprav(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -192,6 +208,13 @@ var
   FInitialized: Boolean;
   FLegendForm: TLegendForm;
 
+// --- Events ---
+
+function DoMainFormCreate(): AError; stdcall;
+begin
+  Result := CadMainWin_CreateMainForm();
+end;
+
 // --- CadApp ---
 
 function CadApp_AddToLogP(const Text: APascalString): AInt;
@@ -210,7 +233,7 @@ end;
 function CadApp_CalcVisible(): AError;
 begin
   try
-    Scene.Coll.CalcVisible(FIsShowAllFigures, Scene.GetCurrentSchemeIndex());
+    Scene.Coll.CalcVisible(IsShowAllFigures, Scene.GetCurrentSchemeIndex());
     Result := 0;
   except
     Result := -1;
@@ -348,6 +371,11 @@ begin
   end;
 end;
 
+function CadApp_GetIsShowAllFigures(): ABool;
+begin
+  Result := IsShowAllFigures;
+end;
+
 function CadApp_GetMaxViewPort(): TRect;
 begin
   try
@@ -420,7 +448,7 @@ begin
   {$ENDIF VCL}
 
   DocDirectory := 'Doc\';
-  FIsShowAllFigures := True;
+  IsShowAllFigures := True;
 
   // --- Init request modules ---
 
@@ -659,7 +687,13 @@ end;
 
 function CadApp_SetIsShowAllFigures(Value: ABool): AError;
 begin
-  FIsShowAllFigures := Value;
+  IsShowAllFigures := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnActivated(Value: AProc): AError;
+begin
+  OnActivated := Value;
   Result := 0;
 end;
 
@@ -675,9 +709,27 @@ begin
   Result := 0;
 end;
 
+function CadApp_SetOnCalcFireGas(Value: AProc): AError;
+begin
+  OnCalcFireGas := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnCalcFirePrev(Value: AProc): AError;
+begin
+  OnCalcFirePrev := Value;
+  Result := 0;
+end;
+
 function CadApp_SetOnCalcFireStability(Value: AProc): AError;
 begin
   OnCalcFireStability := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnCalcTd(Value: AProc): AError;
+begin
+  OnCalcTd := Value;
   Result := 0;
 end;
 
@@ -786,6 +838,24 @@ end;
 function CadApp_SetOnShowData(Value: AProc): AError;
 begin
   OnShowData := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnShowFire(Value: AProc): AError;
+begin
+  OnShowFire := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnShowFireProtectView(Value: AProc): AError;
+begin
+  OnShowFireProtectView := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnShowRevBranchs(Value: AProc): AError;
+begin
+  OnShowRevBranchs := Value;
   Result := 0;
 end;
 

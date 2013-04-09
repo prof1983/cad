@@ -2,7 +2,7 @@
 @Abstract Cad.App - DataUtils
 @Author Prof1983 <prof1983@ya.ru>
 @Created 13.08.2009
-@LastMod 08.04.2013
+@LastMod 09.04.2013
 
                        ----------
                        | CadApp |
@@ -39,14 +39,6 @@ uses
   CadDrawBase,
   CadDrawPrimitive,
   CadDrawScene;
-
-const
-  DataPage0 = 0; // Общие
-  DataPage1 = 1; // Ветви
-  DataPage2 = 2; // Вентиляторы
-  DataPage4 = 4;
-  DataPage6 = 6;
-  DataPage7 = 7;
 
 // --- Data ---
 
