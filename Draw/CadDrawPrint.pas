@@ -1,7 +1,7 @@
 {**
 @Author Prof1983 <prof1983@ya.ru>
 @Created 08.08.2011
-@LastMod 09.04.2013
+@LastMod 10.04.2013
 
     -----------
     | CadDraw |
@@ -26,8 +26,7 @@ interface
 uses
   Types,
   ABase,
-  CadDrawBase,
-  CadDrawFigureCollection;
+  CadDrawBase;
 
 {** Выводит изображение на печать.
     @param IsShowAllFigures = CadAppData.IsShowAllFigures
@@ -54,7 +53,7 @@ procedure _SetPrinterOrientation(Xf, Yf, ScaleXm, ScaleYm: Integer; IsPortret: B
 
 // --- Private ---
 
-procedure _Print(Scene: AGScene; const ImgPath: string; FieldRect, MMRect, DocRect: TRect; AirFlag: AInteger;
+procedure _Print(Scene: CadDrawBase.AGScene; const ImgPath: string; FieldRect, MMRect, DocRect: TRect; AirFlag: AInteger;
     IsShowAllFigures, IsDrawWay, IsPortret, IsBWPrint, PrintStamp, PrintBord: Boolean;
     const Format: string; CopiesCount: Integer);
 var

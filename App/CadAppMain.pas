@@ -31,7 +31,6 @@ uses
   CadData,
   CadDrawBase,
   CadDrawData,
-  CadDrawFigureCollection,
   CadDrawMain,
   CadDrawPrimitive,
   CadDrawScene,
@@ -536,7 +535,7 @@ var
 begin
   {$ifdef Vcl}
   try
-    if not(fPictureSelect.InputPic(AGFigureCollection(CadDraw_GetColl()), Index, PicName, IsPic1)) then
+    if not(fPictureSelect.InputPic(CadDraw_GetColl(), Index, PicName, IsPic1)) then
     begin
       Result := 1;
       Exit;
