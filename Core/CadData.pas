@@ -2,7 +2,7 @@
 @Abstract Общие переменные для Cad
 @Author Prof1983 <prof1983@ya.ru>
 @Created 02.07.2009
-@LastMod 09.04.2013
+@LastMod 10.04.2013
 
      ===========
      | CadData |
@@ -45,8 +45,6 @@ var
   Ex_PolyLine: array of TPolyRec;
   {** Полностью соответсвует таблице TablDavl с Row-2 }
   Ex_Data_Uz: array of TExDataNodeRec;
-  {** Внешние данные ветвей (Irs) }
-  Ex_Data_Branch: array of TBranchIrs;
 
 function CadPrecisionFromChar(const Value: AChar): TCadPrecision;
 function CadPrecisionFromInt(Value: AInt): TCadPrecision;

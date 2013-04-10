@@ -2,7 +2,7 @@
 @Abstract Cad.Core base consts and types
 @Author Prof1983 <prof1983@ya.ru>
 @Created 25.11.2009
-@LastMod 09.04.2013
+@LastMod 10.04.2013
 }
 unit CadCoreBase;
 
@@ -63,26 +63,6 @@ const
 
 type
   TCadLogProc = ABaseTypes.AAddToLogA_Proc;
-
-type
-  TBranchIrs = record
-    {** Номер ветви }
-    BranchNum: AInt;
-    {** Номер узла начала ветви }
-    NodeNum1: AInt;
-    {** Номер узла конца ветви }
-    NodeNum2: AInt;
-    {** Позиция ПЛА }
-    PlaNum: AInt;
-    {** Цвет позиции ПЛА }
-    PlaColor: AInt;
-    {** Цвет стрелки (свежая, исходящая) (0(False)-clBlue else 1(True)-clRed) }
-    ArrowIsFresh: AInt;
-    {** Тип линии (1,14 - Пунктирная (штриховая)) // тип выработки }
-    LineType7: AInt;
-    {** Наименование ветви }
-    Name: string;
-  end;
 
 type
   TExDataNodeRec = record
