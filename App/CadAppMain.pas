@@ -2,7 +2,7 @@
 @Abstract Cad.App.Main
 @Author Prof1983 <prof1983@ya.ru>
 @Created 07.09.2011
-@LastMod 09.04.2013
+@LastMod 10.04.2013
 }
 unit CadAppMain;
 
@@ -31,6 +31,7 @@ uses
   CadData,
   CadDrawBase,
   CadDrawData,
+  CadDrawFigureCollection,
   CadDrawMain,
   CadDrawPrimitive,
   CadDrawScene,
@@ -239,7 +240,7 @@ end;
 function CadApp_CalcVisible(): AError;
 begin
   try
-    Scene.Coll.CalcVisible(IsShowAllFigures, Scene.GetCurrentSchemeIndex());
+    CadDraw_GetColl().CalcVisible(IsShowAllFigures, CadDraw_GetCurrentSchemeIndex());
     Result := 0;
   except
     Result := -1;
@@ -274,7 +275,7 @@ begin
     if IsFullClear then
     begin
       PL.Clear();
-      TV.Clear();
+      CadDrawScene_GetBranchTypes(CadDraw_GetScene()).Clear();
     end;
     
     Result := 0;
@@ -385,7 +386,7 @@ end;
 function CadApp_GetMaxViewPort(): TRect;
 begin
   try
-    Result := Scene.Coll.GetMaxViewPort(DrawWin.Canvas);
+    Result := CadDraw_GetColl().GetMaxViewPort(DrawWin.Canvas);
   except
     Result.Left := 0;
     Result.Top := 0;
@@ -535,7 +536,7 @@ var
 begin
   {$ifdef Vcl}
   try
-    if not(fPictureSelect.InputPic(Scene.Coll, Index, PicName, IsPic1)) then
+    if not(fPictureSelect.InputPic(AGFigureCollection(CadDraw_GetColl()), Index, PicName, IsPic1)) then
     begin
       Result := 1;
       Exit;
@@ -982,7 +983,7 @@ begin // Вызов диалога  - Опции
   try
     Result := 0;
     {$ifdef Vcl}
-    Coll := Scene.Coll;
+    Coll := CadDraw_GetColl();
     SettingsForm := TSettingsForm.Create(nil);
     try
       SettingsForm.SetColSettings(ColSettings);
@@ -990,7 +991,7 @@ begin // Вызов диалога  - Опции
       if (SettingsForm.ShowModal = mrOK) then
       begin
         SettingsForm.GetColSettings(ColSettings);
-        DrawWin_ApplyScheme(Scene.GetCurrentSchemeIndex());
+        DrawWin_ApplyScheme(CadDraw_GetCurrentSchemeIndex());
         PhotoPathStr := SettingsForm.GetPhotoPath;
         CadDraw_SetPhotoPathIsDefault(SettingsForm.CheckBoxFoto.Checked);
         PlaPathStr := SettingsForm.PlaPath.Text;
@@ -1008,7 +1009,7 @@ begin // Вызов диалога  - Опции
         Coll.PrColorAll := SettingsForm.ColorPrRect.Color;
         Coll.PrDefaultWidth := SettingsForm.UpDownPr.Position;
 
-        Coll.CalcVisible(DrawWin.MsxAll.Checked, Scene.GetCurrentSchemeIndex());
+        Coll.CalcVisible(DrawWin.MsxAll.Checked, CadDraw_GetCurrentSchemeIndex());
         DrawWin.cbLayer.Items := SettingsForm.lbLayers.Items;
         DrawWin.cbLayer.ItemIndex := SettingsForm.lbLayers.ItemIndex;
         if (DrawWin.cbLayer.ItemIndex < 0) then
