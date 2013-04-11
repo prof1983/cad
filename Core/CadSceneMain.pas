@@ -29,7 +29,7 @@ function CadScene_AddBranchType(Scene: AGScene; const BranchType: APascalString)
 function CadScene_AddExBranchData(Scene: AGScene; BranchNum, NodeNum1, NodeNum2, PlaNum: AInt;
     PlaColor: AColor; ArrowIsFresh, LineIsDotted: ABool; const Name: APascalString): AError;
 
-function CadScene_AddExNode(Scene: AGScene; Num, X, Y, Z, Typ: AInt): AError; {$ifdef AStdCall}stdcall;{$endif}
+function CadScene_AddExNode(Scene: AGScene; Num, X, Y, Z, Xg, Yg: AInt; IsPov: ABool): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadScene_Clear(Scene: AGScene): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -67,7 +67,7 @@ function CadScene_GetExNodeData(Scene: AGScene; Index: AInt; out ExNodeData: TEx
 
 function CadScene_GetExNodeDataLen(Scene: AGScene): AInt; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadScene_GetExNodeNum0(Scene: AGScene; Index: AInt): AInt; {$ifdef AStdCall}stdcall;{$endif}
+function CadScene_GetExNodeNum(Scene: AGScene; Index: AInt): AInt; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadScene_Init(Scene: AGScene; OnAddDataBranch, OnAddDataNode, OnDeleteFig,
     OnDeleteNode: TGProcedureI): AError; {$ifdef AStdCall}stdcall;{$endif}
@@ -80,7 +80,9 @@ function CadScene_SaveBranchTypesToStream(Scene: AGScene; Stream: TFileStream): 
 
 function CadScene_SetCurrentSchemeIndex(Scene: AGScene; Value: TSchemeIndex): AError; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadScene_SetExNodeByIndex(Scene: AGScene; Index, NdX, NdY, NdZ, NdTyp: AInt): AError; {$ifdef AStdCall}stdcall;{$endif}
+function CadScene_SetExNodeByIndex(Scene: AGScene; Index, X, Y, Z: AInt; IsPov: ABool): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadScene_SetExNodeByIndex2(Scene: AGScene; Index, X, Y, Z, Xg, Yg: AInt; IsPov: ABool): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadScene_SetOnSelectFig(Scene: AGScene; Value: ACallbackProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -172,18 +174,20 @@ begin
   end;
 end;
 
-function CadScene_AddExNode(Scene: AGScene; Num, X, Y, Z, Typ: AInt): AError;
+function CadScene_AddExNode(Scene: AGScene; Num, X, Y, Z, Xg, Yg: AInt; IsPov: ABool): AError;
 var
   I: AInt;
 begin
   try
     I := Length(PGScene(Scene)^.Ex_Data_Uz);
     SetLength(PGScene(Scene)^.Ex_Data_Uz, I + 1);
-    PGScene(Scene)^.Ex_Data_Uz[I].Nd0 := Num;
-    PGScene(Scene)^.Ex_Data_Uz[I].Nd1 := X;
-    PGScene(Scene)^.Ex_Data_Uz[I].Nd2 := Y;
-    PGScene(Scene)^.Ex_Data_Uz[I].Nd3 := Z;
-    PGScene(Scene)^.Ex_Data_Uz[I].Nd4 := Typ;
+    PGScene(Scene)^.Ex_Data_Uz[I].Num := Num;
+    PGScene(Scene)^.Ex_Data_Uz[I].X := X;
+    PGScene(Scene)^.Ex_Data_Uz[I].Y := Y;
+    PGScene(Scene)^.Ex_Data_Uz[I].Z := Z;
+    PGScene(Scene)^.Ex_Data_Uz[I].Xg := Xg;
+    PGScene(Scene)^.Ex_Data_Uz[I].Yg := Yg;
+    PGScene(Scene)^.Ex_Data_Uz[I].IsPov := IsPov;
     Result := 0;
   except
     Result := -1;
@@ -272,7 +276,7 @@ end;
 begin
   for I := 0 to High(PGScene(Scene)^.Ex_Data_Uz) do
   begin
-    if (PGScene(Scene)^.Ex_Data_Uz[I].Nd0 = NdNum) then
+    if (PGScene(Scene)^.Ex_Data_Uz[I].Num = NdNum) then
     begin
       Result := I;
       Exit;
@@ -378,10 +382,10 @@ begin
   end;
 end;
 
-function CadScene_GetExNodeNum0(Scene: AGScene; Index: AInt): AInt;
+function CadScene_GetExNodeNum(Scene: AGScene; Index: AInt): AInt;
 begin
   try
-    Result := PGScene(Scene)^.Ex_Data_Uz[Index].Nd0;
+    Result := PGScene(Scene)^.Ex_Data_Uz[Index].Num;
   except
     Result := 0;
   end;
@@ -417,9 +421,10 @@ end;
 
 function CadScene_New(): AGScene;
 var
-  P: Pointer;
+  P: ^AGScene_Type;
 begin
   GetMem(P, SizeOf(AGScene_Type));
+  FillChar(P^, SizeOf(AGScene_Type), 0);
   Result := AGScene(P);
 end;
 
@@ -443,13 +448,28 @@ begin
   end;
 end;
 
-function CadScene_SetExNodeByIndex(Scene: AGScene; Index, NdX, NdY, NdZ, NdTyp: AInt): AError;
+function CadScene_SetExNodeByIndex(Scene: AGScene; Index, X, Y, Z: AInt; IsPov: ABool): AError;
 begin
   try
-    PGScene(Scene)^.Ex_Data_Uz[Index].Nd1 := NdX;
-    PGScene(Scene)^.Ex_Data_Uz[Index].Nd2 := NdY;
-    PGScene(Scene)^.Ex_Data_Uz[Index].Nd3 := NdZ;
-    PGScene(Scene)^.Ex_Data_Uz[Index].Nd4 := NdTyp;
+    PGScene(Scene)^.Ex_Data_Uz[Index].X := X;
+    PGScene(Scene)^.Ex_Data_Uz[Index].Y := Y;
+    PGScene(Scene)^.Ex_Data_Uz[Index].Z := Z;
+    PGScene(Scene)^.Ex_Data_Uz[Index].IsPov := IsPov;
+    Result := 0;
+  except
+    Result := -1;
+  end;
+end;
+
+function CadScene_SetExNodeByIndex2(Scene: AGScene; Index, X, Y, Z, Xg, Yg: AInt; IsPov: ABool): AError;
+begin
+  try
+    PGScene(Scene)^.Ex_Data_Uz[Index].X := X;
+    PGScene(Scene)^.Ex_Data_Uz[Index].Y := Y;
+    PGScene(Scene)^.Ex_Data_Uz[Index].Z := Z;
+    PGScene(Scene)^.Ex_Data_Uz[Index].Xg := Xg;
+    PGScene(Scene)^.Ex_Data_Uz[Index].Yg := Yg;
+    PGScene(Scene)^.Ex_Data_Uz[Index].IsPov := IsPov;
     Result := 0;
   except
     Result := -1;

@@ -36,7 +36,7 @@ var
 begin
   for J := 0 to CadScene_GetExNodeDataLen(Scene) - 1 do
   begin
-    if (CadScene_GetExNodeNum0(Scene, J) = NdNum) then
+    if (CadScene_GetExNodeNum(Scene, J) = NdNum) then
     begin
       Result := J;
       Exit;

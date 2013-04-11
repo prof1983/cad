@@ -66,16 +66,18 @@ type
 
 type 
   TExDataNodeRec = packed record
-    // 0 - Items[I].NdNum - номер узла
-    Nd0: AInt;
-    // 1 - Items[I].NdPnt.X - координаты узла
-    Nd1: AInt;
-    // 2 - Items[I].NdPnt.Y - координаты узла
-    Nd2: AInt;
-    // 3 - Items[I].NdPntZ - координаты узла
-    Nd3: AInt;
-    // 4 - Items[I].NdType - узел поверхности или нет
-    Nd4: AInt;
+    {** Номер узла }
+    Num: AInt;
+    {** Kоордината узла }
+    X: AInt;
+    {** Координата узла }
+    Y: AInt;
+    {** Координата узла }
+    Z: AInt;
+    Xg: AInt;
+    Yg: AInt;
+    {** Узел поверхности или нет }
+    IsPov: ABool;
   end;
 
 type
@@ -93,6 +95,9 @@ type
     NumNode: AInt;
     PolyCoord: array of APoint;
   end;
+
+type
+  TGProcedureI = procedure(Code: Integer); stdcall;
 
 implementation
 
