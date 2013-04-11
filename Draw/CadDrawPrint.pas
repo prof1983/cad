@@ -1,7 +1,7 @@
 {**
 @Author Prof1983 <prof1983@ya.ru>
 @Created 08.08.2011
-@LastMod 09.04.2013
+@LastMod 11.04.2013
 
     -----------
     | CadDraw |
@@ -46,7 +46,7 @@ uses
   CadDrawData,
   CadDrawMain,
   CadDrawPrimitive,
-  CadDrawScene;
+  CadSceneMain;
 
 // --- Forward ---
 

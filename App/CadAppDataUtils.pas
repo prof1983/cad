@@ -2,7 +2,7 @@
 @Abstract Cad.App - DataUtils
 @Author Prof1983 <prof1983@ya.ru>
 @Created 13.08.2009
-@LastMod 09.04.2013
+@LastMod 11.04.2013
 
                        ----------
                        | CadApp |
@@ -40,7 +40,7 @@ uses
   CadDrawFigureCollection,
   CadDrawMain,
   CadDrawPrimitive,
-  CadDrawScene;
+  CadSceneMain;
 
 // --- Data ---
 

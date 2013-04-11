@@ -2,7 +2,7 @@
 @Abstract Cad.App.Main
 @Author Prof1983 <prof1983@ya.ru>
 @Created 07.09.2011
-@LastMod 10.04.2013
+@LastMod 11.04.2013
 }
 unit CadAppMain;
 
@@ -34,8 +34,8 @@ uses
   CadDrawFigureCollection,
   CadDrawMain,
   CadDrawPrimitive,
-  CadDrawScene,
   CadDrawTypes,
+  CadSceneMain,
   CadStampData,
   fDrawWin, fLegend, fPictureSelect, fPrint;
 
@@ -275,7 +275,7 @@ begin
     if IsFullClear then
     begin
       PL.Clear();
-      CadDrawScene_GetBranchTypes(CadDraw_GetScene()).Clear();
+      CadScene_GetBranchTypes(CadDraw_GetScene()).Clear();
     end;
     
     Result := 0;

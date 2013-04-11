@@ -1,7 +1,7 @@
 {**
 @Author Prof1983 <prof1983@ya.ru>
 @Created 23.11.2009
-@LastMod 09.04.2013
+@LastMod 11.04.2013
 }
 unit fNavigator;
 
@@ -15,8 +15,8 @@ uses
   Graphics,
   Types,
   CadDrawMain,
-  CadDrawScene,
-  CadMainWin;
+  CadMainWin,
+  CadSceneMain;
 
 type
   TNavigatorForm = class(TForm)

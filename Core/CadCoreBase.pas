@@ -2,7 +2,7 @@
 @Abstract Cad.Core base consts and types
 @Author Prof1983 <prof1983@ya.ru>
 @Created 25.11.2009
-@LastMod 10.04.2013
+@LastMod 11.04.2013
 }
 unit CadCoreBase;
 
@@ -64,8 +64,8 @@ const
 type
   TCadLogProc = ABaseTypes.AAddToLogA_Proc;
 
-type
-  TExDataNodeRec = record
+type 
+  TExDataNodeRec = packed record
     // 0 - Items[I].NdNum - номер узла
     Nd0: AInt;
     // 1 - Items[I].NdPnt.X - координаты узла
