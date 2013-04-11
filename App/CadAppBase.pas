@@ -16,11 +16,13 @@ const
   CadApp_Uid = $11033101;
 
 type
-  CadApp_OnAppMessage_Proc = function(var Msg: AUInt; var WParam, LParam: AInt;
+  CadApp_AppMessage_Proc = function(var Msg: AUInt; var WParam, LParam: AInt;
       var Handled: ABool): AError; stdcall;
-  CadApp_OnCloseQuery_Proc = function(var CanClose: ABool): AError; stdcall;
-  CadApp_OnImportDataFromXls_Proc = function(const FileName: AString_Type; IsAll: ABoolean): AError; stdcall;
-  CadApp_OnImportDataOk_Proc = function(const Data: AWideString): AError; stdcall;
+  CadApp_CloseQuery_Proc = function(var CanClose: ABool): AError; stdcall;
+  CadApp_ImportDataFromXls_Proc = function(const FileName: AString_Type; IsAll: ABoolean): AError; stdcall;
+  CadApp_ImportDataOk_Proc = function(const Data: AWideString): AError; stdcall;
+  CadApp_LoadFile_Proc = function(FileName: AString): AError; stdcall;
+  CadApp_LoadFileEx_Proc = function(FileName: AString; FileType: AInt; IsAll: ABool): AError; stdcall;
 
 type
   {** Настройки колонок для отчета }

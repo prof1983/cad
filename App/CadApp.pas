@@ -2,7 +2,7 @@
 @Abstract Cad.App
 @Author Prof1983 <prof1983@ya.ru>
 @Created 30.11.2009
-@LastMod 08.04.2013
+@LastMod 11.04.2013
 }
 unit CadApp;
 
@@ -21,7 +21,6 @@ uses
   AUiBase,
   CadAppBase,
   CadAppDataUtils,
-  CadAppLoader,
   CadCoreBase,
   CadDrawBase;
 
@@ -62,13 +61,6 @@ function LoadFileExP(const FileName: APascalString; FileType: AInt; IsAll: ABool
 {** Загружает файл }
 function LoadFileP(const FileName: APascalString): AError;
 
-{** Загружает графический файл
-    @param PaintBox1 - (TImage) }
-function LoadGraphFile2P(const FileName: APascalString; PaintBox1: AControl): ABool;
-
-{** Загружает графический файл }
-function LoadGraphFileP(const FileName: APascalString): AError;
-
 {** Вызывает диалог выбор файла }
 function Open2(DefFilterIndex: AInt; IsAll: ABool): ABool; stdcall;
 
@@ -93,10 +85,10 @@ function SetIsShowAllFigures(Value: ABool): AError; stdcall;
 function SetOnCompileExtData(Value: AProc): AError; stdcall;
 
 {** Задает реакцию на событие OnImportDataFromXls }
-function SetOnImportDataFromXls(Value: CadApp_OnImportDataFromXls_Proc): AError; stdcall;
+function SetOnImportDataFromXls(Value: CadApp_ImportDataFromXls_Proc): AError; stdcall;
 
 {** Задает реакцию на событие OnImportDataOk }
-function SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError; stdcall;
+function SetOnImportDataOk(Value: CadApp_ImportDataOk_Proc): AError; stdcall;
 
 {** Задает реакцию на событие OnDrawWinInit }
 function SetOnDrawWinInit(Value: AProc): AError; stdcall;
@@ -217,41 +209,20 @@ end;
 
 function LoadFileExP(const FileName: APascalString; FileType: AInt; IsAll: ABool): ABool;
 begin
-  {$IFDEF VCL}
-  try
-    Result := CadApp_LoadFileA(FileName, FileType, IsAll);
-  except
-    Result := False;
-  end;
-  {$ELSE}
+  {$ifdef Vcl}
+  Result := (CadApp_LoadFileExP(FileName, FileType, IsAll) >= 0);
+  {$else}
   Result := False;
-  {$ENDIF VCL}
+  {$endif}
 end;
 
 function LoadFileP(const FileName: APascalString): AError;
 begin
-  {$IFDEF VCL}
-  try
-    if CadApp_LoadFile(FileName) then
-      Result := 0
-    else
-      Result := -2;
-  except
-    Result := -1;
-  end;
-  {$ELSE}
-  Result := -1;
-  {$ENDIF VCL}
-end;
-
-function LoadGraphFile2P(const FileName: APascalString; PaintBox1: AControl): ABool;
-begin
-  Result := CadApp_LoadGraphFileA(FileName, PaintBox1);
-end;
-
-function LoadGraphFileP(const FileName: APascalString): AError;
-begin
-  Result := CadApp_LoadGraphFileP(FileName);
+  {$ifdef Vcl}
+  Result := CadApp_LoadFileP(FileName);
+  {$else}
+  Result := -100;
+  {$endif}
 end;
 
 function Open2(DefFilterIndex: AInt; IsAll: ABool): ABool;
@@ -306,12 +277,12 @@ begin
   {$ENDIF VCL}
 end;
 
-function SetOnImportDataFromXls(Value: CadApp_OnImportDataFromXls_Proc): AError;
+function SetOnImportDataFromXls(Value: CadApp_ImportDataFromXls_Proc): AError;
 begin
   Result := CadApp_SetOnImportDataFromXls(Value);
 end;
 
-function SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError;
+function SetOnImportDataOk(Value: CadApp_ImportDataOk_Proc): AError;
 begin
   Result := CadApp_SetOnImportDataOk(Value);
 end;

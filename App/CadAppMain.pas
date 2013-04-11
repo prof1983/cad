@@ -15,6 +15,7 @@ uses
   ABase,
   AEventsMain,
   ASettingsMain,
+  AStringMain,
   ASystemMain,
   AUiBase,
   AUiDialogsEx2,
@@ -80,6 +81,14 @@ function CadApp_Init(): AError; {$ifdef AStdCall}stdcall;{$endif}
 {** Выбор катринки для вставки в рисунок }
 function CadApp_InputPic(): AError; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadApp_LoadFile(FileName: AString): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_LoadFileEx(FileName: AString; FileType: AInt; IsAll: ABool): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_LoadFileExP(const FileName: APascalString; FileType: AInt; IsAll: ABool): AError;
+
+function CadApp_LoadFileP(const FileName: APascalString): AError;
+
 function CadApp_PaintBoxMouseDown(Button: AMouseButton; Shift: AShiftState; X, Y: AInt): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 //** Загружает данные из строки StrokaDan.
@@ -116,7 +125,7 @@ function CadApp_SetIsShowAllFigures(Value: ABool): AError; {$ifdef AStdCall}stdc
 
 function CadApp_SetOnActivated(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadApp_SetOnAppMessage(Value: CadApp_OnAppMessage_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
+function CadApp_SetOnAppMessage(Value: CadApp_AppMessage_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnCalcFireCurrent(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -130,7 +139,7 @@ function CadApp_SetOnCalcTd(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$en
 
 function CadApp_SetOnCheckData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadApp_SetOnCloseQuery(Value: CadApp_OnCloseQuery_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
+function CadApp_SetOnCloseQuery(Value: CadApp_CloseQuery_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnCompileExtData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -142,9 +151,13 @@ function CadApp_SetOnFileSave(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$
 
 function CadApp_SetOnGenData(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadApp_SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
+function CadApp_SetOnImportDataOk(Value: CadApp_ImportDataOk_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
-function CadApp_SetOnImportDataFromXls(Value: CadApp_OnImportDataFromXls_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
+function CadApp_SetOnImportDataFromXls(Value: CadApp_ImportDataFromXls_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnLoadFile(Value: CadApp_LoadFile_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadApp_SetOnLoadFileEx(Value: CadApp_LoadFileEx_Proc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadApp_SetOnNodeFocus(Value: AProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -556,6 +569,46 @@ begin
   {$endif}
 end;
 
+function CadApp_LoadFile(FileName: AString): AError;
+begin
+  try
+    if Assigned(OnLoadFile) then
+      Result := OnLoadFile(FileName)
+    else
+      Result := -100;
+  except
+    Result := -1;
+  end;
+end;
+
+function CadApp_LoadFileEx(FileName: AString; FileType: AInt; IsAll: ABool): AError;
+begin
+  try
+    if Assigned(OnLoadFileEx) then
+      Result := OnLoadFileEx(FileName, FileType, IsAll)
+    else
+      Result := -100;
+  except
+    Result := -1;
+  end;
+end;
+
+function CadApp_LoadFileExP(const FileName: APascalString; FileType: AInt; IsAll: ABool): AError;
+var
+  S: AString_Type;
+begin
+  AString_SetP(S, FileName);
+  CadApp_LoadFileEx(AString(Addr(S)), FileType, IsAll);
+end;
+
+function CadApp_LoadFileP(const FileName: APascalString): AError;
+var
+  S: AString_Type;
+begin
+  AString_SetP(S, FileName);
+  CadApp_LoadFile(AString(Addr(S)));
+end;
+
 function CadApp_PaintBoxMouseDown(Button: AMouseButton; Shift: AShiftState; X, Y: AInt): AError;
 var
   PeroSostInt: AInt;
@@ -704,7 +757,7 @@ begin
   Result := 0;
 end;
 
-function CadApp_SetOnAppMessage(Value: CadApp_OnAppMessage_Proc): AError;
+function CadApp_SetOnAppMessage(Value: CadApp_AppMessage_Proc): AError;
 begin
   OnAppMessage := Value;
   Result := 0;
@@ -746,7 +799,7 @@ begin
   Result := 0;
 end;
 
-function CadApp_SetOnCloseQuery(Value: CadApp_OnCloseQuery_Proc): AError;
+function CadApp_SetOnCloseQuery(Value: CadApp_CloseQuery_Proc): AError;
 begin
   OnCloseQuery := Value;
   Result := 0;
@@ -782,15 +835,27 @@ begin
   Result := 0;
 end;
 
-function CadApp_SetOnImportDataOk(Value: CadApp_OnImportDataOk_Proc): AError;
+function CadApp_SetOnImportDataOk(Value: CadApp_ImportDataOk_Proc): AError;
 begin
   OnImportDataOk := Value;
   Result := 0;
 end;
 
-function CadApp_SetOnImportDataFromXls(Value: CadApp_OnImportDataFromXls_Proc): AError;
+function CadApp_SetOnImportDataFromXls(Value: CadApp_ImportDataFromXls_Proc): AError;
 begin
   OnImportDataFromXls := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnLoadFile(Value: CadApp_LoadFile_Proc): AError;
+begin
+  OnLoadFile := Value;
+  Result := 0;
+end;
+
+function CadApp_SetOnLoadFileEx(Value: CadApp_LoadFileEx_Proc): AError;
+begin
+  OnLoadFileEx := Value;
   Result := 0;
 end;
 

@@ -2,7 +2,7 @@
 @Abstract Cad.App data
 @Author Prof1983 <prof1983@ya.ru>
 @Created 02.07.2009
-@LastMod 09.04.2013
+@LastMod 11.04.2013
 }
 unit CadAppData;
 
@@ -26,7 +26,7 @@ var NameVar_Text: APascalString;
 
 var OnActivated: AProc;
 
-var OnAppMessage: CadApp_OnAppMessage_Proc;
+var OnAppMessage: CadApp_AppMessage_Proc;
 
 var OnCalcFireCurrent: AProc;
 
@@ -40,7 +40,7 @@ var OnCalcTd: AProc;
 
 var OnCheckData: AProc;
 
-var OnCloseQuery: CadApp_OnCloseQuery_Proc;
+var OnCloseQuery: CadApp_CloseQuery_Proc;
 
 var OnCompileExtData: AProc;
 
@@ -54,11 +54,15 @@ var OnFileSave: AProc;
 var OnGenData: AProc;
 
 {** Event fires when importing data from Xls file }
-var OnImportDataFromXls: CadApp_OnImportDataFromXls_Proc;
+var OnImportDataFromXls: CadApp_ImportDataFromXls_Proc;
 
-var OnImportDataOk: CadApp_OnImportDataOk_Proc;
+var OnImportDataOk: CadApp_ImportDataOk_Proc;
 
 var OnNodeFocus: AProc;
+
+var OnLoadFile: CadApp_LoadFile_Proc;
+
+var OnLoadFileEx: CadApp_LoadFileEx_Proc;
 
 var OnPaintBoxMouseDown: AProc;
 
