@@ -1,7 +1,7 @@
 {**
 @Author Prof1983 <prof1983@ya.ru>
 @Created 12.09.2011
-@LastMod 11.04.2013
+@LastMod 12.04.2013
 }
 unit CadSceneMain;
 
@@ -69,6 +69,10 @@ function CadScene_GetExNodeDataLen(Scene: AGScene): AInt; {$ifdef AStdCall}stdca
 
 function CadScene_GetExNodeNum(Scene: AGScene; Index: AInt): AInt; {$ifdef AStdCall}stdcall;{$endif}
 
+function CadScene_GetExNodeXY(Scene: AGScene; Index: AInt; out X, Y: AInt): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadScene_GetExNodeXYg(Scene: AGScene; Index: AInt; out Xg, Yg: AInt): AError; {$ifdef AStdCall}stdcall;{$endif}
+
 function CadScene_Init(Scene: AGScene; OnAddDataBranch, OnAddDataNode, OnDeleteFig,
     OnDeleteNode: TGProcedureI): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -83,6 +87,10 @@ function CadScene_SetCurrentSchemeIndex(Scene: AGScene; Value: TSchemeIndex): AE
 function CadScene_SetExNodeByIndex(Scene: AGScene; Index, X, Y, Z: AInt; IsPov: ABool): AError; {$ifdef AStdCall}stdcall;{$endif}
 
 function CadScene_SetExNodeByIndex2(Scene: AGScene; Index, X, Y, Z, Xg, Yg: AInt; IsPov: ABool): AError; {$ifdef AStdCall}stdcall;{$endif}
+
+function CadScene_SetExNodeXY(Scene: AGScene; Index, X, Y: AInt): AError;
+
+function CadScene_SetExNodeXYg(Scene: AGScene; Index, Xg, Yg: AInt): AError;
 
 function CadScene_SetOnSelectFig(Scene: AGScene; Value: ACallbackProc): AError; {$ifdef AStdCall}stdcall;{$endif}
 
@@ -391,6 +399,28 @@ begin
   end;
 end;
 
+function CadScene_GetExNodeXY(Scene: AGScene; Index: AInt; out X, Y: AInt): AError;
+begin
+  try
+    X := PGScene(Scene)^.Ex_Data_Uz[Index].X;
+    Y := PGScene(Scene)^.Ex_Data_Uz[Index].Y;
+    Result := 0;
+  except
+    Result := -1;
+  end;
+end;
+
+function CadScene_GetExNodeXYg(Scene: AGScene; Index: AInt; out Xg, Yg: AInt): AError;
+begin
+  try
+    Xg := PGScene(Scene)^.Ex_Data_Uz[Index].Xg;
+    Yg := PGScene(Scene)^.Ex_Data_Uz[Index].Yg;
+    Result := 0;
+  except
+    Result := -1;
+  end;
+end;
+
 function CadScene_Init(Scene: AGScene; OnAddDataBranch, OnAddDataNode, OnDeleteFig,
     OnDeleteNode: TGProcedureI): AError;
 var
@@ -470,6 +500,28 @@ begin
     PGScene(Scene)^.Ex_Data_Uz[Index].Xg := Xg;
     PGScene(Scene)^.Ex_Data_Uz[Index].Yg := Yg;
     PGScene(Scene)^.Ex_Data_Uz[Index].IsPov := IsPov;
+    Result := 0;
+  except
+    Result := -1;
+  end;
+end;
+
+function CadScene_SetExNodeXY(Scene: AGScene; Index, X, Y: AInt): AError;
+begin
+  try
+    X := PGScene(Scene)^.Ex_Data_Uz[Index].X;
+    Y := PGScene(Scene)^.Ex_Data_Uz[Index].Y;
+    Result := 0;
+  except
+    Result := -1;
+  end;
+end;
+
+function CadScene_SetExNodeXYg(Scene: AGScene; Index, Xg, Yg: AInt): AError;
+begin
+  try
+    Xg := PGScene(Scene)^.Ex_Data_Uz[Index].Xg;
+    Yg := PGScene(Scene)^.Ex_Data_Uz[Index].Yg;
     Result := 0;
   except
     Result := -1;
