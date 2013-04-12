@@ -196,17 +196,14 @@ begin
       begin
         if (CadScene_GetExNodeXYg(Scene, J, X1, Y1) >= 0) then
         begin
-          for I := 0 to Len - 1 do
+          for I := J+1 to Len - 1 do
           begin
-            if (I <> J) then
+            if (CadScene_GetExNodeXYg(Scene, I, X2, Y2) >= 0) then
             begin
-              if (CadScene_GetExNodeXYg(Scene, I, X2, Y2) >= 0) then
+              if (X1 = X2) and (Y1 = Y2) then
               begin
-                if (X1 = X2) and (Y1 = Y2) then
-                begin
-                  CadScene_SetExNodeXYg(Scene, I, X2 + 1, Y2);
-                  Inc(K);
-                end;
+                CadScene_SetExNodeXYg(Scene, I, X2 + 1, Y2);
+                Inc(K);
               end;
             end;
           end;
@@ -216,17 +213,14 @@ begin
       begin
         if (CadScene_GetExNodeXY(Scene, J, X1, Y1) >= 0) then
         begin
-          for I := 0 to Len - 1 do
+          for I := J+1 to Len - 1 do
           begin
-            if (I <> J) then
+            if (CadScene_GetExNodeXY(Scene, I, X2, Y2) >= 0) then
             begin
-              if (CadScene_GetExNodeXY(Scene, I, X2, Y2) >= 0) then
+              if (X1 = X2) and (Y1 = Y2) then
               begin
-                if (X1 = X2) and (Y1 = Y2) then
-                begin
-                  CadScene_SetExNodeXY(Scene, I, X2 + 1, Y2);
-                  Inc(K);
-                end;
+                CadScene_SetExNodeXY(Scene, I, X2 + 1, Y2);
+                Inc(K);
               end;
             end;
           end;
@@ -282,7 +276,7 @@ begin
     BranchNum := Sheet.Cells.Item[BranchRow,BranchCol.N]; // номер ветви
     kxs := 0;
     kx := 0;
-    if IsAll or (_FindBranch(Coll, BranchNum) < 0) then
+    if (BranchNum > 0) and (IsAll or (_FindBranch(Coll, BranchNum) < 0)) then
     begin
       StringGrid_RowClearA(TablData, kk);
 
@@ -355,7 +349,8 @@ begin
     else
       TablVen.RowCount := iv+2;
 
-    if Assigned(Callback) then Callback();
+    if Assigned(Callback) then
+      Callback();
   until BranchRow > RowsCount;
 
   // Unassign the Delphi Variant Matrix
@@ -422,7 +417,7 @@ begin
   if not(IsAll) then
     AddExistingNodes(Scene);
 
-  for RowK := TitleRow+1 to RowsCount do
+  for RowK := TitleRow+1 to RowsCount+1 do
   begin
     NdNum := Sheet.Cells.Item[RowK, NodeCol.N]; // номер узла
     NdX := ReadCellsFloat(RowK,NodeCol.Kx); // координата x
@@ -683,7 +678,7 @@ end;
 procedure CadImportXls_ReadNodes(Scene: AGScene; Sheet: IExcelWorksheet; TablDavl: TStringGrid;
     Ver, TitleRow: AInt; const NodeCol: TNodeColRec; IsAll: ABool; Callback: AProc);
 begin
-  _ReadNodesTable_(Scene, Sheet, Ver, TitleRow, NodeCol, 5, -5, IsAll, Callback);
+  _ReadNodesTable(Scene, Sheet, Ver, TitleRow, NodeCol, 5, -5, IsAll, Callback);
   _CheckCoord(Scene, Ver);
   _RefreshNodeTable(Scene, TablDavl);
 end;
