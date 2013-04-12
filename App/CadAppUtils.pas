@@ -2,7 +2,7 @@
 @Abstract Cad.App util functions
 @Author Prof1983 <prof1983@yandex.ru>
 @Created 27.06.2009
-@LastMod 08.04.2013
+@LastMod 12.04.2013
 }
 unit CadAppUtils;
 
@@ -55,16 +55,15 @@ uses
 
 // --- Private ---
 
-{$IFDEF VCL}
 // Высчитывает угол между двумя точками. Возвращает угол в градусах.
-function _ReturnParAngle(p1, p2: TPoint): Integer;
+function _ReturnParAngle(X1, Y1, X2, Y2: AInt): AInt;
 var
-  ShX: Integer;
-  ShY: Integer;
-  Angle: Double;
+  ShX: AInt;
+  ShY: AInt;
+  Angle: AFloat;
 begin
-  ShX := p1.X - p2.X;
-  ShY := p1.Y - p2.Y;
+  ShX := X1 - X2;
+  ShY := Y1 - Y2;
   if (ShX <> 0) then
     Angle := ArcTan2(-ShY,-ShX)
   else if (ShY > 0) then
@@ -73,7 +72,6 @@ begin
     Angle:= Pi/2;
   Result := Round(RadToDeg(Angle));
 end;
-{$ENDIF}
 
 {$IFDEF VCL}
 function _ReturnParAnglePolyline(Polyline: TGBranchPolyline): Integer;
@@ -91,9 +89,9 @@ begin
   PntE := Polyline.GetNodeEPnt();
 
   if (Polyline.PCount >= 1) then
-    Result := _ReturnParAngle(Polyline.Pl[Polyline.PCount-1], PntE)
+    Result := _ReturnParAngle(Polyline.Pl[Polyline.PCount-1].X, Polyline.Pl[Polyline.PCount-1].Y, PntE.X, PntE.Y)
   else
-    Result := _ReturnParAngle(PntB, PntE);
+    Result := _ReturnParAngle(PntB.X, PntB.Y, PntE.X, PntE.Y);
 end;
 {$ENDIF}
 
@@ -143,7 +141,11 @@ begin
   if (Branch is TGBranchLine) then
   begin
     with (Branch as TGBranchLine) do
-      ParAngle := _ReturnParAngle(NdList.Items[Brn.BrBNodeI].NdPnt, NdList.Items[Brn.BrENodeI].NdPnt);
+      ParAngle := _ReturnParAngle(
+          NdList.Items[Brn.BrBNodeI].NdPnt_X,
+          NdList.Items[Brn.BrBNodeI].NdPnt_Y,
+          NdList.Items[Brn.BrENodeI].NdPnt_X,
+          NdList.Items[Brn.BrENodeI].NdPnt_Y);
   end;
 
   // Относится к полилинии

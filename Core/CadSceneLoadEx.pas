@@ -1,7 +1,7 @@
 {**
 @Author Prof1983 <prof1983@ya.ru>
 @Created 10.04.2013
-@LastMod 11.04.2013
+@LastMod 12.04.2013
 }
 unit CadSceneLoadEx;
 
@@ -51,17 +51,28 @@ function CadDrawFigureColl_LoadObjectsIrs(Scene: AGScene; Layer: AInt; TablDavl:
     var NomSxema: TSchemeIndex): AError;
 
   function AddFigureBranchB(Scene: AGScene; Layer, X1, Y1, Z1, X2, Y2, Z2, IsLoad: AInt;
-      LineColor: TColor; NodeNum1, NodeNum2, BranchNum, NodeType1, NodeType2: AInt;
+      LineColor: TColor; NodeNum1, NodeNum2, BranchNum: AInt; NodeIsPov1, NodeIsPov2: ABool;
       const BranchName: APascalString): TGBranchLine;
   var
     I: AInt;
     Coll: TGCollFigure;
+    T1: AInt;
+    T2: AInt;
   begin
     Result := TGBranchLine.Create(Scene, Layer);
     if Assigned(Result) then
     begin
       Coll := CadDrawScene_GetColl(Scene);
-      Result.SetLineA(X1, Y1, Z1, X2, Y2, Z2, IsLoad, LineColor, NodeNum1, NodeNum2, BranchNum, NodeType1, NodeType2, BranchName);
+      if NodeIsPov1 then
+        T1 := 1
+      else
+        T1 := 0;
+      if NodeIsPov2 then
+        T2 := 1
+      else
+        T2 := 0;
+      Result.SetLineA(X1, Y1, Z1, X2, Y2, Z2, IsLoad, LineColor, NodeNum1, NodeNum2, BranchNum,
+          T1, T2, BranchName);
       I := Coll.AddFigure(Result);
       Coll.SelectFigByIndex(I);
       Coll.AddDataBranch1(Result.Brn.BrNum);
@@ -71,10 +82,10 @@ function CadDrawFigureColl_LoadObjectsIrs(Scene: AGScene; Layer: AInt; TablDavl:
   function AddFigureBranchC(Scene: AGScene; Layer, BranchNum: AInt; BranchName: APascalString;
       const P1, P2: TExDataNodeRec): TGBranchLine;
   begin
-    Result := AddFigureBranchB(Scene, Layer, P1.Nd1, P1.Nd2, P1.Nd3,
-        P2.Nd1, P2.Nd2, P2.Nd3, 0, 0,
-        P1.Nd0, P2.Nd0, BranchNum,
-        P1.Nd4, P2.Nd4, BranchName);
+    Result := AddFigureBranchB(Scene, Layer, P1.X, P1.Y, P1.Z, P2.X, P2.Y, P2.Z,
+        0, 0,
+        P1.Num, P2.Num, BranchNum,
+        P1.IsPov, P2.IsPov, BranchName);
   end;
 
 var
