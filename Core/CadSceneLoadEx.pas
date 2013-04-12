@@ -95,7 +95,7 @@ function CadDrawFigureColl_LoadObjectsIrs(Scene: AGScene; Layer: AInt; TablDavl:
   P2: AInt;
   NomPla: AInt;
   Ip: AInt;
-  Kp: AInt;
+  Kp: AInt; // Индекс позиции ПЛА
   MasPosPla: array of AInt;
   Branch: TGBranch;
   Coll: TGCollFigure;
@@ -125,10 +125,10 @@ begin
     Coll.defWidth := 2;
     Coll.defLineType := 1;
 
-    kp := 1;
+    Kp := 0;
     BranchDataLen := CadScene_GetExBranchDataLen(Scene);
-    SetLength(MasPosPla, BranchDataLen-1);
-    for I := 0 to BranchDataLen - 2 do
+    SetLength(MasPosPla, BranchDataLen);
+    for I := 0 to BranchDataLen - 1 do
     begin
       CadScene_GetExBranchData(Scene, I, BranchNum, NodeNum1, NodeNum2, PlaNum,
           PlaColor, ArrowIsFresh, LineIsDotted, Name);
@@ -158,7 +158,7 @@ begin
       Branch.Brn.ExtData3.Color := PlaColor;
       Branch.Brn.ExtData3.Enable := True;
       NomPla := PlaNum;
-      for ip := 0 to kp-1 do
+      for ip := 0 to Kp do
       begin
         if (MasPosPla[ip] = NomPla) then
         begin
@@ -168,8 +168,8 @@ begin
       end;
       if (Branch.Brn.ExtData3.Enable = True) then
       begin
-        MasPosPla[kp] := NomPla;
-        Inc(kp);
+        MasPosPla[Kp] := NomPla;
+        Inc(Kp);
       end;
 
       if (ArrowIsFresh) then
