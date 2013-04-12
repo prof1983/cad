@@ -1,7 +1,7 @@
 {**
 @Author Prof1983 <prof1983@ya.ru>
 @Created 01.02.2010
-@LastMod 11.04.2013
+@LastMod 12.04.2013
 }
 unit CadImportXlsUtils;
 
@@ -21,6 +21,7 @@ uses
   AUiGrids,
   AUtilsMain,
   CadAppDataUtils,
+  CadCoreBase,
   CadDrawBase,
   CadDrawFigureCollection,
   CadDrawPrimitive,
@@ -85,14 +86,6 @@ procedure CadImportXls_ReadBranchs(Scene: AGScene; Sheet: IExcelWorksheet;
 
 procedure CadImportXls_ReadNodes(Scene: AGScene; Sheet: IExcelWorksheet; TablDavl: TStringGrid;
     Ver, TitleRow: AInt; const NodeCol: TNodeColRec; IsAll: ABool; Callback: AProc);
-
-procedure CadImportXls_Work1(TablDavl: TStringGrid; Ver: AInt; Callback: AProc);
-
-procedure CadImportXls_Work2(Scene: AGScene; TablDavl: TStringGrid; Ver: AInt;
-    IsAll: ABool; Callback: AProc);
-
-function CadImportXls_Work3(Scene: AGScene; TablDavl: TStringGrid; Ver: AInt;
-    IsAll: ABool; Callback: AProc): AError;
 
 implementation
 
@@ -176,6 +169,71 @@ begin
   except
     Result := -1;
   end;
+end;
+
+{** Проверяет координаты узлов на совпадение
+    Если координаты совпадают, то сдвигает их на 1 по оси X }
+procedure _CheckCoord(Scene: AGScene; Ver: AInt);
+var
+  I: AInt;
+  Iter: AInt;
+  J: AInt;
+  K: AInt;
+  Len: AInt;
+  X1: AInt;
+  X2: AInt;
+  Y1: AInt;
+  Y2: AInt;
+begin
+  Len := CadScene_GetExNodeDataLen(Scene);
+  Iter := 0;
+  repeat
+    K := 0;
+    Inc(Iter);
+    for J := 0 to Len - 1 do
+    begin
+      if (Ver = 2) then
+      begin
+        if (CadScene_GetExNodeXYg(Scene, J, X1, Y1) >= 0) then
+        begin
+          for I := 0 to Len - 1 do
+          begin
+            if (I <> J) then
+            begin
+              if (CadScene_GetExNodeXYg(Scene, I, X2, Y2) >= 0) then
+              begin
+                if (X1 = X2) and (Y1 = Y2) then
+                begin
+                  CadScene_SetExNodeXYg(Scene, I, X2 + 1, Y2);
+                  Inc(K);
+                end;
+              end;
+            end;
+          end;
+        end;
+      end
+      else
+      begin
+        if (CadScene_GetExNodeXY(Scene, J, X1, Y1) >= 0) then
+        begin
+          for I := 0 to Len - 1 do
+          begin
+            if (I <> J) then
+            begin
+              if (CadScene_GetExNodeXY(Scene, I, X2, Y2) >= 0) then
+              begin
+                if (X1 = X2) and (Y1 = Y2) then
+                begin
+                  CadScene_SetExNodeXY(Scene, I, X2 + 1, Y2);
+                  Inc(K);
+                end;
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;
+  until (K = 0) or (Iter = 10);
 end;
 
 function _FindBranch(Coll: TGCollFigure; nv: AInt): AInt;
@@ -304,64 +362,129 @@ begin
   TablData.RowCount := kk;
 end;
 
-{** Импортирует узлы }
-procedure _ReadNodesTable(Scene: AGScene; Sheet: IExcelWorksheet; TablDavl: TStringGrid;
-    Ver, TitleRow: AInt; const NodeCol: TNodeColRec;
+{** Импортирует узлы
+    ScaleX = 5
+    ScaleY = -5 }
+procedure _ReadNodesTable(Scene: AGScene; Sheet: IExcelWorksheet;
+    Ver, TitleRow: AInt; const NodeCol: TNodeColRec; ScaleX, ScaleY: AFloat;
     IsAll: ABool; Callback: AProc);
+
+  { Добавляет существующие узлы в список }
+  procedure AddExistingNodes(Scene: AGScene);
+  var
+    I: Integer;
+    NodeList: TGCollNode;
+  begin
+    NodeList := CadDrawScene_GetColl(Scene).GetNodeList();
+    for I := 0 to NodeList.GetCount-1 do
+    begin
+      CadScene_AddExNode(
+          Scene,
+          NodeList.Items[I].NdNum,
+          NodeList.Items[I].NdPnt_X,
+          NodeList.Items[I].NdPnt_Y,
+          NodeList.Items[I].NdPnt_Z,
+          NodeList.Items[I].NdPnt_X,
+          NodeList.Items[I].NdPnt_Y,
+          NodeList.Items[I].NdType = 1);
+    end;
+  end;
 
   function ReadCellsFloat(Row, Col: Integer): Real;
   begin
+    if (Col <= 0) then
+    begin
+      Result := 0;
+      Exit;
+    end;
     Result := Sheet.Cells.Item[Row, Col];
   end;
 
+const
+  SYes = 'Да';
 var
-  RowK: Integer;     // Номер текущей строки в импортируемой таблице
-  nomu: Integer;     // Номер текущего узла
-  NodeRow: Integer;  // Счетчик для заполнения таблицы узлов
+  RowK: AInt;     // Номер текущей строки в импортируемой таблице
   S1: string;
   S2: string;
-  NodeList: TGCollNode;
   RowsCount: AInt;
+  J: AInt;
+var
+  NdNum: AInt; // Номер текущего узла
+  NdX: AFloat;
+  NdY: AFloat;
+  NdZ: AFloat;
+  NdXg: AFloat;
+  NdYg: AFloat;
+  NdIsPov: ABool;
 begin
   RowsCount := Sheet.UsedRange[FLCID].Rows.Count;
-  NodeList := CadDrawScene_GetColl(Scene).NodeList;
 
-  NodeRow := TablDavl.FixedRows;
   if not(IsAll) then
-    NodeRow := TablDavl.RowCount;
+    AddExistingNodes(Scene);
 
-  RowK := TitleRow;
-  Inc(RowK);
-  repeat
-    nomu := Sheet.Cells.Item[RowK, NodeCol.N]; // номер узла
-    if IsAll or (NodeList.FindNode(nomu) < 0) then
+  for RowK := TitleRow+1 to RowsCount do
+  begin
+    NdNum := Sheet.Cells.Item[RowK, NodeCol.N]; // номер узла
+    NdX := ReadCellsFloat(RowK,NodeCol.Kx); // координата x
+    NdY := ReadCellsFloat(RowK,NodeCol.Ky); // координата y
+    NdZ := ReadCellsFloat(RowK,NodeCol.Kz); // координата z
+    NdXg := ReadCellsFloat(RowK,NodeCol.Kxg) * ScaleX; // координата x
+    NdYg := ReadCellsFloat(RowK,NodeCol.Kyg) * ScaleY; // координата y
+    S1 := Sheet.Cells.Item[RowK,NodeCol.P]; // 'Поверхностный'
+    S2 := Sheet.Cells.Item[RowK,NodeCol.V]; // 'Выход'
+    // Если узел 'Поверхностный' или 'Выход', значит это узел поверхности
+    if (S1 = SYes) or (S2 = SYes) then
+      NdIsPov := True
+    else
+      NdIsPov := False;
+
+    J := CadScene_FindExNode(Scene, NdNum);
+    if (J >= 0) then
     begin
+      if IsAll then
+        CadScene_SetExNodeByIndex2(Scene, J, Round(NdX), Round(NdY), Round(NdZ), Round(NdXg), Round(NdYg), NdIsPov)
+      else
+        CadScene_SetExNodeByIndex(Scene, J, Round(NdX), Round(NdY), Round(NdZ), NdIsPov)
+    end
+    else
+    begin
+      CadScene_AddExNode(Scene, NdNum, Round(NdX), Round(NdY), Round(NdZ), Round(NdXg), Round(NdYg), NdIsPov);
+    end;
+
+    if Assigned(Callback) then
+      Callback();
+  end;
+end;
+
+procedure _RefreshNodeTable(Scene: AGScene; TablDavl: TStringGrid);
+var
+  I: AInt;
+  Len: AInt;
+  NodeRow: AInt;  // Счетчик для заполнения таблицы узлов
+  FixedRows: AInt;
+  NodeData: TExDataNodeRec;
+begin
+  FixedRows := TablDavl.FixedRows;
+  Len := CadScene_GetExNodeDataLen(Scene);
+  for I := 0 to Len - 1 do
+  begin
+    if (CadScene_GetExNodeData(Scene, I, NodeData) >= 0) then
+    begin
+      NodeRow := I + FixedRows;
+      StringGrid_SetRowCount(TablDavl, NodeRow + 1);
       StringGrid_RowClearA(TablDavl, NodeRow);
-
-      TablDavl.Cells[0,NodeRow] := Sheet.Cells.Item[RowK, NodeCol.N]; // номер узла
-
-      TablDavl.Cells[4,NodeRow] := FormatFloat('#0.00',ReadCellsFloat(RowK,NodeCol.Kx)); // координата x
-      TablDavl.Cells[5,NodeRow] := FormatFloat('#0.00',ReadCellsFloat(RowK,NodeCol.Ky)); // координата y
-      TablDavl.Cells[6,NodeRow] := FormatFloat('#0.00',ReadCellsFloat(RowK,NodeCol.Kz)); // координата z
-      if (Ver = 2) then
-      begin
-        TablDavl.Cells[8,NodeRow] := FormatFloat('#0.00',ReadCellsFloat(RowK,NodeCol.Kxg)*5); // координата x
-        TablDavl.Cells[9,NodeRow] := FormatFloat('#0.00',ReadCellsFloat(RowK,NodeCol.Kyg)*-5); // координата y
-      end;
-      S1 := Sheet.Cells.Item[RowK,NodeCol.P]; // 'Поверхностный'
-      S2 := Sheet.Cells.Item[RowK,NodeCol.V]; // 'Выход'
-      // Если узел 'Поверхностный' или 'Выход', значит это узел поверхности
-      if (S1 = 'Да') or (S2 = 'Да') then
+      TablDavl.Cells[0,NodeRow] := IntToStr(NodeData.Num); // номер узла
+      if NodeData.IsPov then
         TablDavl.Cells[1,NodeRow] := '1'
       else
         TablDavl.Cells[1,NodeRow] := '0';
-      Inc(NodeRow);
+      TablDavl.Cells[4,NodeRow] := IntToStr(NodeData.X); // координата x
+      TablDavl.Cells[5,NodeRow] := IntToStr(NodeData.Y); // координата y
+      TablDavl.Cells[6,NodeRow] := IntToStr(NodeData.Z); // координата z
+      //TablDavl.Cells[8,NodeRow] := FormatFloat('#0.00', NodeData.Xg); // координата x граф
+      //TablDavl.Cells[9,NodeRow] := FormatFloat('#0.00', NodeData.Yg); // координата y граф
     end;
-    Inc(RowK);
-
-    if Assigned(Callback) then Callback();
-  until RowK > RowsCount;
-  StringGrid_SetRowCount(TablDavl, NodeRow);
+  end;
 end;
 
 // --- CadImportXls ---
@@ -560,157 +683,9 @@ end;
 procedure CadImportXls_ReadNodes(Scene: AGScene; Sheet: IExcelWorksheet; TablDavl: TStringGrid;
     Ver, TitleRow: AInt; const NodeCol: TNodeColRec; IsAll: ABool; Callback: AProc);
 begin
-  _ReadNodesTable(Scene, Sheet, TablDavl, Ver, TitleRow, NodeCol, IsAll, Callback);
-end;
-
-procedure CadImportXls_Work1(TablDavl: TStringGrid; Ver: AInt; Callback: AProc);
-var
-  nd: Integer;
-  ki: Integer;
-  I: Integer;
-  kx: Real;
-  ky: Real;
-  kx1: Real;
-  ky1: Real;
-  RowK: Integer; // Счетчик
-begin
-  nd := 0;
-  if (Ver = 2) then
-  begin
-    repeat
-      ki := 0;
-      Inc(nd);
-      for RowK := TablDavl.FixedRows to TablDavl.RowCount-1 do
-      begin
-        kx := Round(AUtils_StrToFloatDefP(TablDavl.Cells[8,RowK],0));
-        ky := Round(AUtils_StrToFloatDefP(TablDavl.Cells[9,RowK],0));
-        for I := TablDavl.FixedRows to TablDavl.RowCount-1 do
-        begin
-          kx1 := Round(AUtils_StrToFloatDefP(TablDavl.Cells[8,I],0));
-          ky1 := Round(AUtils_StrToFloatDefP(TablDavl.Cells[9,I],0));
-          if (kx = kx1) and (ky = ky1) and (RowK <> I) then
-          begin
-            kx1 := kx1 + 1;
-            TablDavl.Cells[8,I] := FormatFloat('#0.00',kx1);
-            Inc(ki);
-          end;
-        end;
-        if Assigned(Callback) then Callback();
-      end;
-    until (ki = 0) or (nd = 10);
-  end
-  else
-  begin
-    repeat
-      ki := 0;
-      Inc(nd);
-      for RowK := TablDavl.FixedRows to TablDavl.RowCount-1 do
-      begin
-        kx := AUtils_StrToFloatDefP(TablDavl.Cells[4,RowK],0);
-        ky := AUtils_StrToFloatDefP(TablDavl.Cells[5,RowK],0);
-        for I := TablDavl.FixedRows to TablDavl.RowCount-1 do
-        begin
-          kx1 := AUtils_StrToFloatDefP(TablDavl.Cells[4,I],0);
-          ky1 := AUtils_StrToFloatDefP(TablDavl.Cells[5,I],0);
-          if (kx = kx1) and (ky = ky1) and (RowK <> I) then
-          begin
-            kx1 := kx1 + 1;
-            TablDavl.Cells[4,I] := AUtils_FormatFloatP(kx1,1,2);
-            Inc(ki);
-          end;
-        end;
-        if Assigned(Callback) then Callback();
-      end;
-    until (ki = 0) or (nd = 10);
-  end;
-end;
-
-procedure CadImportXls_Work2(Scene: AGScene; TablDavl: TStringGrid; Ver: AInt;
-    IsAll: ABool; Callback: AProc);
-var
-  I: Integer;
-  NodeList: TGCollNode;
-begin
-  if not(IsAll) then
-  begin
-    NodeList := CadDrawScene_GetColl(Scene).GetNodeList();
-    for I := 0 to NodeList.GetCount-1 do
-    begin
-      CadScene_AddExNode(
-          Scene,
-          NodeList.Items[I].NdNum,
-          NodeList.Items[I].NdPnt.X,
-          NodeList.Items[I].NdPnt.Y,
-          NodeList.Items[I].NdPntZ,
-          NodeList.Items[I].NdType);
-      if Assigned(Callback) then
-        Callback();
-    end;
-  end;
-end;
-
-function CadImportXls_Work3(Scene: AGScene; TablDavl: TStringGrid; Ver: AInt;
-    IsAll: ABool; Callback: AProc): AError;
-var
-  I: AInt;
-  J: AInt;
-  kknu: AInt;
-  NdNum: AInt;
-  NdX: AInt;
-  NdY: AInt;
-  NdZ: AInt;
-  NdTyp: AInt;
-begin
-  kknu := TablDavl.FixedRows;
-  if not(IsAll) then
-    kknu := TablDavl.RowCount;
-
-  for I := kknu to TablDavl.RowCount-1 do
-  begin
-    NdNum := 0;
-    NdX := 0;
-    NdY := 0;
-    NdZ := 0;
-    NdTyp := 0;
-
-    // NdNum
-    if (AUtils_TrimP(TablDavl.Cells[0,I]) <> '') then
-      NdNum := AUtils_StrToIntP(TablDavl.Cells[0,I]);
-    if (Ver = 2) then
-    begin
-      // NdPntX
-      if (AUtils_TrimP(TablDavl.Cells[8,I]) <> '') then
-        NdX := Round(AUtils_StrToFloatP(TablDavl.Cells[8,I]));
-      // NdPntY
-      if (AUtils_TrimP(TablDavl.Cells[9,I]) <> '') then
-        NdY := Round(AUtils_StrToFloatP(TablDavl.Cells[9,I]));
-    end
-    else
-    begin
-      // NdPntX
-      if (AUtils_TrimP(TablDavl.Cells[4,I]) <> '') then
-        NdX := -Round(AUtils_StrToFloatP(TablDavl.Cells[4,I]));
-      // NdPntY
-      if (AUtils_TrimP(TablDavl.Cells[5,I]) <> '') then
-        NdY := Round(AUtils_StrToFloatP(TablDavl.Cells[5,I]));
-    end;
-    // NdPntZ
-    if (AUtils_TrimP(TablDavl.Cells[6,I]) <> '') then
-      NdZ := Round(AUtils_StrToFloatP(TablDavl.Cells[6,I]));
-    // NdType
-    if (AUtils_TrimP(TablDavl.Cells[1,I]) <> '') then
-      NdTyp := AUtils_StrToIntP(TablDavl.Cells[1,I]); // узел поверхности
-
-    J := CadScene_FindExNode(Scene, NdNum);
-    if (J >= 0) then
-      CadScene_SetExNodeByIndex(Scene, J, NdX, NdY, NdZ, NdTyp)
-    else
-      CadScene_AddExNode(Scene, NdNum, NdX, NdY, NdZ, NdTyp);
-
-    if Assigned(Callback) then
-      Callback();
-  end;
-  Result := 0;
+  _ReadNodesTable_(Scene, Sheet, Ver, TitleRow, NodeCol, 5, -5, IsAll, Callback);
+  _CheckCoord(Scene, Ver);
+  _RefreshNodeTable(Scene, TablDavl);
 end;
 
 end.

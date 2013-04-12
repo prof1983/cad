@@ -2,7 +2,7 @@
 @Abstract Import data from xls file
 @Author Prof1983 <prof1983@ya.ru>
 @Created 08.09.2011
-@LastMod 11.04.2013
+@LastMod 12.04.2013
 }
 unit CadImportXls;
 
@@ -114,10 +114,6 @@ begin
 
   // Закрываем Excel
   CadImportXls_Quit();
-  // Обработаем таблицу узлов
-  CadImportXls_Work1(TablDavl, Ver, nil);
-  CadImportXls_Work2(Scene, TablDavl, Ver, IsAll, nil);
-  CadImportXls_Work3(Scene, TablDavl, Ver, IsAll, nil);
 
   Result := 0;
 end;
@@ -197,59 +193,6 @@ begin
 
     // Закрываем Excel
     CadImportXls_Quit();
-
-    // --- Обработаем таблицу узлов ---
-
-    //ASystem.ShowMessageP('Обработка 1/3');
-
-    try
-      WaitWinStep := 10;
-      WaitWinMaxPosition := CadDrawScene_GetColl(Scene).NodeList.GetCount();
-      AUiWaitWin_SetMaxPosition(WaitWin, WaitWinMaxPosition);
-      WaitWinStr := 'Обработка 1/3 '+AUtils_IntToStrP(WaitWinMaxPosition)+'/';
-      AUiWaitWin_SetTextP(WaitWin, WaitWinStr);
-      WaitWinPosition := 0;
-      CadImportXls_Work2(Scene, TablDavl, Ver, IsAll, DoCallback);
-    except
-      Result := -6;
-      Exit;
-    end;
-
-    //ASystem.ShowMessageP('Обработка 2/3');
-
-    try
-      WaitWinStep := 10;
-      WaitWinMaxPosition := TablDavl.RowCount;
-      AUiWaitWin_SetMaxPosition(WaitWin, WaitWinMaxPosition);
-      WaitWinStr := 'Обработка '+AUtils_IntToStrP(WaitWinMaxPosition)+'/';
-      AUiWaitWin_SetTextP(WaitWin, WaitWinStr);
-      WaitWinPosition := 0;
-      CadImportXls_Work1(TablDavl, Ver, DoCallback);
-    except
-      Result := -5;
-      Exit;
-    end;
-
-    //ASystem.ShowMessageP('Обработка 3/3');
-
-    try
-      WaitWinStep := 10;
-      WaitWinMaxPosition := TablDavl.RowCount;
-      AUiWaitWin_SetMaxPosition(WaitWin, WaitWinMaxPosition);
-      WaitWinStr := 'Обработка 3/3 '+AUtils_IntToStrP(WaitWinMaxPosition)+'/';
-      AUiWaitWin_SetTextP(WaitWin, WaitWinStr);
-      WaitWinPosition := 0;
-      Res := CadImportXls_Work3(Scene, TablDavl, Ver, IsAll, DoCallback);
-      if (Res < 0) then
-      begin
-        AUi_ExecuteMessageDialog1P('Произошла ошибка в CadImportXls_Work3. WaitWinPosition='+AUtils_IntToStrP(WaitWinPosition), '', 0);
-        Result := -8;
-        Exit;
-      end;
-    except
-      Result := -7;
-      Exit;
-    end;
 
     Result := 0;
   finally
