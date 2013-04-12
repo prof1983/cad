@@ -220,8 +220,8 @@ end;
 function CadScene_ClearExData(Scene: AGScene): AError;
 begin
   try
-    SetLength(PGScene(Scene)^.Ex_Data_Branch, 2);
-    SetLength(PGScene(Scene)^.Ex_Data_Uz, 2);
+    SetLength(PGScene(Scene)^.Ex_Data_Branch, 0);
+    SetLength(PGScene(Scene)^.Ex_Data_Uz, 0);
     SetLength(Ex_PolyLine, 10);
     Result := 0;
   except

@@ -126,8 +126,6 @@ const
 var
   Sheet: IExcelWorksheet;
   RowsCount1: Integer;
-  WaitWinMaxPosition: Integer;
-  Res: AError;
   NodeCol: TNodeColRec;
   BranchCol: TBranchColRec;
 begin
