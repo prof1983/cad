@@ -11,6 +11,7 @@ interface
 uses
   Grids,
   ABase,
+  AErrorObj,
   AUiBase,
   AUiControls,
   AUiDialogsEx1,
@@ -73,14 +74,15 @@ const
   BranchsTitleRow = 4; // Номер строки с наименованием колонок в импортируемой таблице ветвей
   NodesTitleRow = 4; // Номер строки с наименованием колонок в импортируемой таблице узлов
 var
-  Sheet: IExcelWorksheet;
-  NodeCol: TNodeColRec;
   BranchCol: TBranchColRec;
+  Er: AError;
+  NodeCol: TNodeColRec;
+  Sheet: IExcelWorksheet;
 begin
   // Открываем Excel
   if (CadImportXls_Prepare(Scene, FileName) < 0) then
   begin
-    Result := -2;
+    Result := AError_NewP('Произошла ошибка при подготовке импорта из Excel');;
     Exit;
   end;
 
@@ -90,11 +92,19 @@ begin
     // Подготавливаем узлы
     CadImportXls_PrepareNodes(Sheet, TablDavl, NodesTitleRow, IsAll, Ver, NodeCol);
     // Импортируем узлы
-    CadImportXls_ReadNodes(Scene, Sheet, TablDavl, Ver, NodesTitleRow, NodeCol, IsAll, nil);
+    Er := CadImportXls_ReadNodes(Scene, Sheet, TablDavl, Ver, NodesTitleRow, NodeCol, IsAll, nil);
+    if (Er <> 0) then
+    begin
+      CadImportXls_Quit();
+      Sheet := nil;
+      AError_InsertLnP(Er, 'Произошла ошибка при импорте узлов');
+      Result := Er;
+      Exit;
+    end;
   except
     CadImportXls_Quit();
     Sheet := nil;
-    Result := -3;
+    Result := AError_NewP('Произошла ошибка при импорте узлов');
     Exit;
   end;
 
@@ -104,11 +114,18 @@ begin
     // Подготавливаем ветви
     CadImportXls_PrepareBranchs(Sheet, BranchsTitleRow, IsAll, BranchCol);
     // Импортируем ветви
-    CadImportXls_ReadBranchs(Scene, Sheet, TablData, TablVen, BranchsTitleRow, BranchCol, IsAll, nil);
+    Er := CadImportXls_ReadBranchs(Scene, Sheet, TablData, TablVen, BranchsTitleRow, BranchCol, IsAll, nil);
+    if (Er <> 0) then
+    begin
+      CadImportXls_Quit();
+      Sheet := nil;
+      Result := Er;
+      Exit;
+    end;
   except
     CadImportXls_Quit();
     Sheet := nil;
-    Result := -4;
+    Result := AError_NewP('Произошла ошибка при импорте ветвей');
     Exit;
   end;
 
@@ -124,10 +141,11 @@ const
   BranchsTitleRow = 4; // Номер строки с наименованием колонок в импортируемой таблице ветвей
   NodesTitleRow = 4; // Номер строки с наименованием колонок в импортируемой таблице узлов
 var
-  Sheet: IExcelWorksheet;
-  RowsCount1: Integer;
-  NodeCol: TNodeColRec;
   BranchCol: TBranchColRec;
+  Er: AError;
+  NodeCol: TNodeColRec;
+  RowsCount1: AInt;
+  Sheet: IExcelWorksheet;
 begin
   if not(ShowWaitWin) then
   begin
@@ -159,7 +177,15 @@ begin
       AUiWaitWin_SetMaxPosition(WaitWin, RowsCount1);
       AUiWaitWin_SetPosition(WaitWin, 0);
       // Импортируем узлы
-      CadImportXls_ReadNodes(Scene, Sheet, TablDavl, Ver, NodesTitleRow, NodeCol, IsAll, DoCallback);
+      Er := CadImportXls_ReadNodes(Scene, Sheet, TablDavl, Ver, NodesTitleRow, NodeCol, IsAll, DoCallback);
+      if (Er <> 0) then
+      begin
+        CadImportXls_Quit();
+        Sheet := nil;
+        AError_InsertLnP(Er, 'Произошла ошибка при импорте узлов');
+        Result := Er;
+        Exit;
+      end;
     except
       CadImportXls_Quit();
       Sheet := nil;
@@ -181,11 +207,18 @@ begin
       AUiWaitWin_SetMaxPosition(WaitWin, RowsCount1);
       AUiWaitWin_SetPosition(WaitWin, 0);
       // Импортируем ветви
-      CadImportXls_ReadBranchs(Scene, Sheet, TablData, TablVen, BranchsTitleRow, BranchCol, IsAll, DoCallback);
+      Er := CadImportXls_ReadBranchs(Scene, Sheet, TablData, TablVen, BranchsTitleRow, BranchCol, IsAll, DoCallback);
+      if (Er <> 0) then
+      begin
+        CadImportXls_Quit();
+        Sheet := nil;
+        Result := Er;
+        Exit;
+      end;
     except
       CadImportXls_Quit();
       Sheet := nil;
-      Result := -4;
+      Result := AError_NewP('Произошла ошибка при импорте ветвей');
       Exit;
     end;
 

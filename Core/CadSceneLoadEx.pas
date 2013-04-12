@@ -11,6 +11,7 @@ uses
   Graphics,
   Grids,
   ABase,
+  AErrorObj,
   AUtilsMain,
   CadCoreBase,
   CadDrawBase,
@@ -50,8 +51,8 @@ end;
 function CadDrawFigureColl_LoadObjectsIrs(Scene: AGScene; Layer: AInt; TablDavl: TStringGrid;
     var NomSxema: TSchemeIndex): AError;
 
-  function AddFigureBranchB(Scene: AGScene; Layer, X1, Y1, Z1, X2, Y2, Z2, IsLoad: AInt;
-      LineColor: TColor; NodeNum1, NodeNum2, BranchNum: AInt; NodeIsPov1, NodeIsPov2: ABool;
+  function AddFigureBranchB(Scene: AGScene; Layer, X1, Y1, Z1, X2, Y2, Z2: AInt;
+      NodeNum1, NodeNum2, BranchNum: AInt; NodeIsPov1, NodeIsPov2: ABool;
       const BranchName: APascalString): TGBranchLine;
   var
     I: AInt;
@@ -71,7 +72,7 @@ function CadDrawFigureColl_LoadObjectsIrs(Scene: AGScene; Layer: AInt; TablDavl:
         T2 := 1
       else
         T2 := 0;
-      Result.SetLineA(X1, Y1, Z1, X2, Y2, Z2, IsLoad, LineColor, NodeNum1, NodeNum2, BranchNum,
+      Result.SetLineA(X1, Y1, Z1, X2, Y2, Z2, 0, 0, NodeNum1, NodeNum2, BranchNum,
           T1, T2, BranchName);
       I := Coll.AddFigure(Result);
       Coll.SelectFigByIndex(I);
@@ -83,9 +84,7 @@ function CadDrawFigureColl_LoadObjectsIrs(Scene: AGScene; Layer: AInt; TablDavl:
       const P1, P2: TExDataNodeRec): TGBranchLine;
   begin
     Result := AddFigureBranchB(Scene, Layer, P1.X, P1.Y, P1.Z, P2.X, P2.Y, P2.Z,
-        0, 0,
-        P1.Num, P2.Num, BranchNum,
-        P1.IsPov, P2.IsPov, BranchName);
+        P1.Num, P2.Num, BranchNum, P1.IsPov, P2.IsPov, BranchName);
   end;
 
 var
@@ -129,7 +128,7 @@ begin
     BranchDataLen := CadScene_GetExBranchDataLen(Scene);
     SetLength(MasPosPla, BranchDataLen);
     for I := 0 to BranchDataLen - 1 do
-    begin
+    try
       CadScene_GetExBranchData(Scene, I, BranchNum, NodeNum1, NodeNum2, PlaNum,
           PlaColor, ArrowIsFresh, LineIsDotted, Name);
 
@@ -184,6 +183,9 @@ begin
         Sel.WidthDefault := False;
         Sel.PenBrushDefault := False;
       end;
+    except
+      Result := AError_NewP('Произошла ошибка при загрузке объектов из внешних данных. I='+AUtils_IntToStrP(I));
+      Exit;
     end;
 
     for k := TablDavl.FixedRows to TablDavl.RowCount-1 do
@@ -217,7 +219,7 @@ begin
 
     Result := 0;
   except
-    Result := -1;
+    Result := AError_NewP('Произошла ошибка при загрузке объектов из внешних данных');
   end;
 end;
 

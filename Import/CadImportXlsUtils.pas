@@ -17,6 +17,7 @@ uses
   {$endif}
   ExcelXP,
   ABase,
+  AErrorObj,
   ASystemMain,
   AUiGrids,
   AUtilsMain,
@@ -80,12 +81,12 @@ procedure CadImportXls_PrepareNodes(Sheet: IExcelWorksheet; TablDavl: TStringGri
 
 procedure CadImportXls_Quit();
 
-procedure CadImportXls_ReadBranchs(Scene: AGScene; Sheet: IExcelWorksheet;
+function CadImportXls_ReadBranchs(Scene: AGScene; Sheet: IExcelWorksheet;
     TablData, TablVen: TStringGrid; BranchsTitleRow: AInt; const BranchCol: TBranchColRec;
-    IsAll: ABool; Callback: AProc);
+    IsAll: ABool; Callback: AProc): AError;
 
-procedure CadImportXls_ReadNodes(Scene: AGScene; Sheet: IExcelWorksheet; TablDavl: TStringGrid;
-    Ver, TitleRow: AInt; const NodeCol: TNodeColRec; IsAll: ABool; Callback: AProc);
+function CadImportXls_ReadNodes(Scene: AGScene; Sheet: IExcelWorksheet; TablDavl: TStringGrid;
+    Ver, TitleRow: AInt; const NodeCol: TNodeColRec; IsAll: ABool; Callback: AProc): AError;
 
 implementation
 
@@ -360,9 +361,9 @@ end;
 {** Импортирует узлы
     ScaleX = 5
     ScaleY = -5 }
-procedure _ReadNodesTable(Scene: AGScene; Sheet: IExcelWorksheet;
+function _ReadNodesTable(Scene: AGScene; Sheet: IExcelWorksheet;
     Ver, TitleRow: AInt; const NodeCol: TNodeColRec; ScaleX, ScaleY: AFloat;
-    IsAll: ABool; Callback: AProc);
+    IsAll: ABool; Callback: AProc): AError;
 
   { Добавляет существующие узлы в список }
   procedure AddExistingNodes(Scene: AGScene);
@@ -398,11 +399,12 @@ procedure _ReadNodesTable(Scene: AGScene; Sheet: IExcelWorksheet;
 const
   SYes = 'Да';
 var
-  RowK: AInt;     // Номер текущей строки в импортируемой таблице
+  J: AInt;
+  Row: AInt;     // Номер текущей строки в импортируемой таблице
+  RowsCount: AInt;
+  S: APascalString;
   S1: string;
   S2: string;
-  RowsCount: AInt;
-  J: AInt;
 var
   NdNum: AInt; // Номер текущего узла
   NdX: AFloat;
@@ -417,16 +419,24 @@ begin
   if not(IsAll) then
     AddExistingNodes(Scene);
 
-  for RowK := TitleRow+1 to RowsCount+1 do
-  begin
-    NdNum := Sheet.Cells.Item[RowK, NodeCol.N]; // номер узла
-    NdX := ReadCellsFloat(RowK,NodeCol.Kx); // координата x
-    NdY := ReadCellsFloat(RowK,NodeCol.Ky); // координата y
-    NdZ := ReadCellsFloat(RowK,NodeCol.Kz); // координата z
-    NdXg := ReadCellsFloat(RowK,NodeCol.Kxg) * ScaleX; // координата x
-    NdYg := ReadCellsFloat(RowK,NodeCol.Kyg) * ScaleY; // координата y
-    S1 := Sheet.Cells.Item[RowK,NodeCol.P]; // 'Поверхностный'
-    S2 := Sheet.Cells.Item[RowK,NodeCol.V]; // 'Выход'
+  for Row := TitleRow+1 to RowsCount+1 do
+  try
+    S := Sheet.Cells.Item[Row, NodeCol.N];
+    if (S = '') or (S = 'Всего') then
+      Continue;
+    NdNum := AUtils_StrToIntP(S); // номер узла
+    if (NdNum = 0) then
+    begin
+      Result := AError_NewP('Произошла ошибка при импорте узла. Номер узла не верный. Row='+IntToStr(Row));
+      Exit;
+    end;
+    NdX := ReadCellsFloat(Row,NodeCol.Kx); // координата x
+    NdY := ReadCellsFloat(Row,NodeCol.Ky); // координата y
+    NdZ := ReadCellsFloat(Row,NodeCol.Kz); // координата z
+    NdXg := ReadCellsFloat(Row,NodeCol.Kxg) * ScaleX; // координата x
+    NdYg := ReadCellsFloat(Row,NodeCol.Kyg) * ScaleY; // координата y
+    S1 := Sheet.Cells.Item[Row,NodeCol.P]; // 'Поверхностный'
+    S2 := Sheet.Cells.Item[Row,NodeCol.V]; // 'Выход'
     // Если узел 'Поверхностный' или 'Выход', значит это узел поверхности
     if (S1 = SYes) or (S2 = SYes) then
       NdIsPov := True
@@ -448,7 +458,12 @@ begin
 
     if Assigned(Callback) then
       Callback();
+  except
+    Result := AError_NewP('Произошла ошибка при импорте узла Row='+IntToStr(Row));
+    Exit;
   end;
+
+  Result := 0;
 end;
 
 procedure _RefreshNodeTable(Scene: AGScene; TablDavl: TStringGrid);
@@ -668,19 +683,32 @@ begin
   end;
 end;
 
-procedure CadImportXls_ReadBranchs(Scene: AGScene; Sheet: IExcelWorksheet;
+function CadImportXls_ReadBranchs(Scene: AGScene; Sheet: IExcelWorksheet;
     TablData, TablVen: TStringGrid; BranchsTitleRow: AInt; const BranchCol: TBranchColRec;
-    IsAll: ABool; Callback: AProc);
+    IsAll: ABool; Callback: AProc): AError;
 begin
-  _ReadBranchsTable(Scene, Sheet, TablData, TablVen, BranchsTitleRow, BranchCol, IsAll, Callback);
+  try
+    _ReadBranchsTable(Scene, Sheet, TablData, TablVen, BranchsTitleRow, BranchCol, IsAll, Callback);
+    Result := 0;
+  except
+    Result := AError_NewP('Произошла ошибка при импорте ветвей');
+  end;
 end;
 
-procedure CadImportXls_ReadNodes(Scene: AGScene; Sheet: IExcelWorksheet; TablDavl: TStringGrid;
-    Ver, TitleRow: AInt; const NodeCol: TNodeColRec; IsAll: ABool; Callback: AProc);
+function CadImportXls_ReadNodes(Scene: AGScene; Sheet: IExcelWorksheet; TablDavl: TStringGrid;
+    Ver, TitleRow: AInt; const NodeCol: TNodeColRec; IsAll: ABool; Callback: AProc): AError;
+var
+  Er: AError;
 begin
-  _ReadNodesTable(Scene, Sheet, Ver, TitleRow, NodeCol, 5, -5, IsAll, Callback);
+  Er := _ReadNodesTable(Scene, Sheet, Ver, TitleRow, NodeCol, 5, -5, IsAll, Callback);
+  if (Er <> 0) then
+  begin
+    Result := Er;
+    Exit;
+  end;
   _CheckCoord(Scene, Ver);
   _RefreshNodeTable(Scene, TablDavl);
+  Result := 0;
 end;
 
 end.
