@@ -2,7 +2,7 @@
 @Abstract Cad.App consts
 @Author Prof1983 <prof1983@ya.ru>
 @Created 26.04.2011
-@LastMod 15.03.2013
+@LastMod 17.04.2013
 }
 unit CadAppConsts;
 
@@ -12,6 +12,7 @@ resourcestring
   ERROR_LOADING = 'Ошибка загрузки документа';
   SMenuBookmarksText = 'Избранное';
   SMenuFileText = 'Файл';
+  SMenuReportsText = 'Отчеты';
   SMenuSprav = 'Справочники';
   SMenuTasksText = 'Задачи';
   SMenuToolsText = 'Сервис';

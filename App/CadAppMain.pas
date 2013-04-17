@@ -2,7 +2,7 @@
 @Abstract Cad.App.Main
 @Author Prof1983 <prof1983@ya.ru>
 @Created 07.09.2011
-@LastMod 10.04.2013
+@LastMod 16.04.2013
 }
 unit CadAppMain;
 
@@ -216,7 +216,7 @@ var
 
 // --- Events ---
 
-function DoMainFormCreate(): AError; stdcall;
+function DoMainFormCreate(): AInt; stdcall;
 begin
   Result := CadMainWin_CreateMainForm();
 end;
