@@ -2,7 +2,7 @@
 @Abstract Cad.App.Main
 @Author Prof1983 <prof1983@ya.ru>
 @Created 07.09.2011
-@LastMod 11.04.2013
+@LastMod 18.04.2013
 }
 unit CadAppMain;
 
@@ -597,16 +597,24 @@ function CadApp_LoadFileExP(const FileName: APascalString; FileType: AInt; IsAll
 var
   S: AString_Type;
 begin
-  AString_SetP(S, FileName);
-  CadApp_LoadFileEx(AString(Addr(S)), FileType, IsAll);
+  try
+    AString_SetP(S, FileName);
+    Result := CadApp_LoadFileEx(AString(Addr(S)), FileType, IsAll);
+  except
+    Result := -1;
+  end;
 end;
 
 function CadApp_LoadFileP(const FileName: APascalString): AError;
 var
   S: AString_Type;
 begin
-  AString_SetP(S, FileName);
-  CadApp_LoadFile(AString(Addr(S)));
+  try
+    AString_SetP(S, FileName);
+    Result := CadApp_LoadFile(AString(Addr(S)));
+  except
+    Result := -1;
+  end;
 end;
 
 function CadApp_PaintBoxMouseDown(Button: AMouseButton; Shift: AShiftState; X, Y: AInt): AError;
