@@ -1,7 +1,7 @@
 {**
 @Author Prof1983 <prof1983@ya.ru>
 @Created 12.09.2011
-@LastMod 12.04.2013
+@LastMod 18.04.2013
 }
 unit CadSceneMain;
 
@@ -509,8 +509,8 @@ end;
 function CadScene_SetExNodeXY(Scene: AGScene; Index, X, Y: AInt): AError;
 begin
   try
-    X := PGScene(Scene)^.Ex_Data_Uz[Index].X;
-    Y := PGScene(Scene)^.Ex_Data_Uz[Index].Y;
+    PGScene(Scene)^.Ex_Data_Uz[Index].X := X;
+    PGScene(Scene)^.Ex_Data_Uz[Index].Y := Y;
     Result := 0;
   except
     Result := -1;
@@ -520,8 +520,8 @@ end;
 function CadScene_SetExNodeXYg(Scene: AGScene; Index, Xg, Yg: AInt): AError;
 begin
   try
-    Xg := PGScene(Scene)^.Ex_Data_Uz[Index].Xg;
-    Yg := PGScene(Scene)^.Ex_Data_Uz[Index].Yg;
+    PGScene(Scene)^.Ex_Data_Uz[Index].Xg := Xg;
+    PGScene(Scene)^.Ex_Data_Uz[Index].Yg := Yg;
     Result := 0;
   except
     Result := -1;
