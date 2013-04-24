@@ -2,7 +2,7 @@
 @Abstract CadStamp
 @Author Prof1983 <prof9183@ya.ru>
 @Created 19.08.2010
-@LastMod 15.03.2013
+@LastMod 24.04.2013
 }
 unit CadStampMain;
 
@@ -12,6 +12,7 @@ interface
 
 uses
   ABase,
+  AUiMain,
   AUiMainWindow2,
   AUtilsMain,
   CadAppData,
@@ -361,6 +362,12 @@ end;
 
 function CadStamp_Init(): AError;
 begin
+  if (AUi_Init() <> 0) then
+  begin
+    Result := -3;
+    Exit;
+  end;
+
   if (CadDraw.Init() < 0) then
   begin
     Result := -2;
