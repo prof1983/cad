@@ -2,7 +2,7 @@
 @Abstract CadStamp
 @Author Prof1983 <prof9183@ya.ru>
 @Created 19.08.2010
-@LastMod 15.03.2013
+@LastMod 24.04.2013
 }
 unit CadStampMain;
 
@@ -12,11 +12,13 @@ interface
 
 uses
   ABase,
+  AErrorObj,
+  AUiMain,
   AUiMainWindow2,
   AUtilsMain,
   CadAppData,
   CadCoreBase,
-  CadDraw,
+  CadDrawMain,
   CadStampData;
 
 // --- CadStamp ---
@@ -360,14 +362,33 @@ begin
 end;
 
 function CadStamp_Init(): AError;
+var
+  Er: AError;
 begin
-  if (CadDraw.Init() < 0) then
+  Er := AUi_Init();
+  if (Er <> 0) then
   begin
-    Result := -2;
+    Result := AError_NewP('Ошибка при инициализации AUi'#13#10 + AError_GetMsgP(Er));
+    AError_Free(Er);
     Exit;
   end;
 
-  CadDraw.SetOnStampDraw(DoStampDraw);
+  Er := CadDraw_Init();
+  if (Er <> 0) then
+  begin
+    Result := AError_NewP('Ошибка при инициализации CadDraw'#13#10 + AError_GetMsgP(Er));
+    AError_Free(Er);
+    Exit;
+  end;
+
+  Er := CadDraw_SetOnStampDraw(DoStampDraw);
+  if (Er <> 0) then
+  begin
+    Result := AError_NewP('Error in CadDraw_SetOnStampDraw()'#13#10 + AError_GetMsgP(Er));
+    AError_Free(Er);
+    Exit;
+  end;
+
   AUiMainWindow_AddMenuItemP('Tools', 'Stamp', 'Штамп...', DoStampSettings, 0, 180);
   Result := 0;
 end;
